@@ -109,6 +109,10 @@ If the project's icon directory doesn't contain the latest game resources:
 3. Add the downloaded PNG to `icon/Texture2D/` directory
 4. Register the item ID in `paint_local.html` under the `ITEM_TEXTURES` JSON mapping
 
+## Music Record Title
+
+If want to display music recrod title, put `musics.json` and `mysekaiMusicRecords.json` into `data` folder.
+
 ## License
 
 MIT License - See [LICENSE](LICENSE) file for details

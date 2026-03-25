@@ -9,6 +9,10 @@ import { canvasState, sceneState, domElements, canvasOptimizationState, filterSt
 const MOBILE_PREVIEW_HIDE_MS = 2200;
 let previewAutoHideTimer = null;
 let lastTouchPreviewTime = 0;
+
+// Music data mapping: resourceId -> { title, externalId }
+let musicRecordMap = {};
+let musicDataLoaded = false;
 import { initCanvas, drawGrid, markPoint, displayReward, processPendingItemPositions, adjustItemListPositions, clearItemLists, clearDirtyRegions, calculateDirtyRegions, clearGrid, aggregatePoints } from './canvas.js';
 import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback } from './filters.js';
 import { handleFileUpload, processJsonFile } from './dataParser.js';
@@ -37,6 +41,44 @@ export function logger(message) {
 
     // Auto-scroll to bottom
     logContainer.scrollTop = logContainer.scrollHeight;
+}
+
+/**
+ * Load music data for music record display
+ */
+async function loadMusicData() {
+    try {
+        const [records, musics] = await Promise.all([
+            fetch('data/mysekaiMusicRecords.json').then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            }),
+            fetch('data/musics.json').then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
+        ]);
+
+        // Build music id → title mapping
+        const musicTitleMap = {};
+        musics.forEach(m => {
+            musicTitleMap[m.id] = m.title;
+        });
+
+        // Build resourceId → { title, externalId } mapping
+        records.forEach(r => {
+            musicRecordMap[r.id] = {
+                title: musicTitleMap[r.externalId] || 'Unknown',
+                externalId: r.externalId
+            };
+        });
+
+        musicDataLoaded = true;
+        logger(`Loaded ${Object.keys(musicRecordMap).length} music records`);
+    } catch (error) {
+        logger(`Music data not available (will use fallback display)`);
+        musicDataLoaded = false;
+    }
 }
 
 /**
@@ -502,6 +544,8 @@ export function initializeDropZone() {
     fileInput.addEventListener('change', (e) => {
         if (e.target.files.length > 0) {
             handleFileUpload(e.target.files[0], onDataLoaded, onDataError);
+            // Clear the input value to allow re-uploading the same file
+            e.target.value = '';
         }
     });
 
@@ -735,6 +779,7 @@ export function updateItemSummary() {
 
     // Aggregate items with their quantities
     const itemMap = {}; // { "category_itemId": { texture, quantity, category, itemId } }
+    let pointIndex = 0; // Track point index for unique keys
 
     points.forEach(point => {
         for (const category in point.reward) {
@@ -747,26 +792,45 @@ export function updateItemSummary() {
                     continue;
                 }
 
-                const key = `${category}_${itemId}`;
                 const quantity = point.reward[category][itemId];
 
-                if (!itemMap[key]) {
-                    let texture = ITEM_TEXTURES[category]?.[itemId] || './icon/missing.png';
-                    if (category === "mysekai_music_record") {
-                        texture = './icon/Texture2D/item_surplus_music_record.png';
+                // Special handling for music records: don't aggregate if music data is loaded
+                if (category === "mysekai_music_record" && musicDataLoaded) {
+                    // Create unique key for each music record to prevent aggregation
+                    const uniqueKey = `${category}_${itemId}_${pointIndex}`;
+                    const musicData = musicRecordMap[itemId];
+                    
+                    itemMap[uniqueKey] = {
+                        texture: './icon/Texture2D/item_surplus_music_record.png',
+                        quantity: quantity,
+                        category: category,
+                        itemId: itemId,
+                        musicTitle: musicData ? `#${itemId}: ${musicData.externalId} ${musicData.title}` : `#${itemId}: Unknown`,
+                        externalId: musicData?.externalId
+                    };
+                } else {
+                    // Normal aggregation for other items (and music records if data not loaded)
+                    const key = `${category}_${itemId}`;
+
+                    if (!itemMap[key]) {
+                        let texture = ITEM_TEXTURES[category]?.[itemId] || './icon/missing.png';
+                        if (category === "mysekai_music_record") {
+                            texture = './icon/Texture2D/item_surplus_music_record.png';
+                        }
+
+                        itemMap[key] = {
+                            texture: texture,
+                            quantity: 0,
+                            category: category,
+                            itemId: itemId
+                        };
                     }
 
-                    itemMap[key] = {
-                        texture: texture,
-                        quantity: 0,
-                        category: category,
-                        itemId: itemId
-                    };
+                    itemMap[key].quantity += quantity;
                 }
-
-                itemMap[key].quantity += quantity;
             }
         }
+        pointIndex++;
     });
 
     // Render item summary
@@ -786,12 +850,24 @@ export function updateItemSummary() {
     });
 
     sortedItems.forEach(item => {
-        html += `
-            <div class="item-summary-item" title="${item.category} #${item.itemId}">
-                <img src="${item.texture}" alt="${item.category} #${item.itemId}">
-                <span class="item-summary-quantity">×${item.quantity}</span>
-            </div>
-        `;
+        // Special rendering for music records with loaded data
+        if (item.category === "mysekai_music_record" && item.musicTitle) {
+            const tooltipText = `${item.category} #${item.itemId} - ${item.musicTitle}`;
+            html += `
+                <div class="item-summary-item music-record" title="${tooltipText}">
+                    <img src="${item.texture}" alt="${item.musicTitle}">
+                    <span class="item-summary-music-title">${item.musicTitle}</span>
+                </div>
+            `;
+        } else {
+            // Normal rendering for other items (and music records without data)
+            html += `
+                <div class="item-summary-item" title="${item.category} #${item.itemId}">
+                    <img src="${item.texture}" alt="${item.category} #${item.itemId}">
+                    <span class="item-summary-quantity">×${item.quantity}</span>
+                </div>
+            `;
+        }
     });
 
     html += '</div>';
@@ -818,6 +894,9 @@ export function initializeUI() {
 
     // Set up callback for filter changes
     setFilterChangeCallback(parseAndMarkPoints);
+
+    // Load music data for music record display
+    loadMusicData();
 
     logger('Page loaded. Please load a data file to continue.');
     initializeSidebar();

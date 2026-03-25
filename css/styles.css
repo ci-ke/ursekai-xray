@@ -908,6 +908,21 @@ summary:hover {
     text-align: center;
 }
 
+.item-summary-music-title {
+    font-weight: 500;
+    color: var(--primary);
+    font-size: 0.85rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 280px;
+}
+
+.item-summary-item.music-record {
+    min-width: 200px;
+    max-width: 350px;
+}
+
 .item-summary-empty {
     color: #999;
     font-style: italic;

@@ -6,3 +6,7 @@ AGENTS.md
 .claude/
 testdata/
 __pycache__/
+
+data
+
+.narrafork
