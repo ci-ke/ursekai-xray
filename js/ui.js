@@ -841,28 +841,35 @@ export function updateItemSummary() {
 
     let html = '<h3>📊 Scene Items Summary</h3><div class="item-summary-content">';
 
-    // Sort items by category for better organization
+    // Sort items: super rare first, then rare, then by category/itemId
     const sortedItems = Object.values(itemMap).sort((a, b) => {
-        if (a.category !== b.category) {
-            return a.category.localeCompare(b.category);
-        }
+        const aSuper = doContainsRareItem({ [a.category]: { [a.itemId]: 1 } }, true);
+        const bSuper = doContainsRareItem({ [b.category]: { [b.itemId]: 1 } }, true);
+        const aRare  = doContainsRareItem({ [a.category]: { [a.itemId]: 1 } }, false);
+        const bRare  = doContainsRareItem({ [b.category]: { [b.itemId]: 1 } }, false);
+        if (aSuper !== bSuper) return aSuper ? -1 : 1;
+        if (aRare  !== bRare)  return aRare  ? -1 : 1;
+        if (a.category !== b.category) return a.category.localeCompare(b.category);
         return a.itemId - b.itemId;
     });
 
     sortedItems.forEach(item => {
+        const isSuperRare = doContainsRareItem({ [item.category]: { [item.itemId]: 1 } }, true);
+        const isRare      = doContainsRareItem({ [item.category]: { [item.itemId]: 1 } }, false);
+        const rareClass   = isSuperRare ? ' super-rare' : (isRare ? ' rare' : '');
+
         // Special rendering for music records with loaded data
         if (item.category === "mysekai_music_record" && item.musicTitle) {
             const tooltipText = `${item.category} #${item.itemId} - ${item.musicTitle}`;
             html += `
-                <div class="item-summary-item music-record" title="${tooltipText}">
+                <div class="item-summary-item music-record${rareClass}" title="${tooltipText}">
                     <img src="${item.texture}" alt="${item.musicTitle}">
                     <span class="item-summary-music-title">${item.musicTitle}</span>
                 </div>
             `;
         } else {
-            // Normal rendering for other items (and music records without data)
             html += `
-                <div class="item-summary-item" title="${item.category} #${item.itemId}">
+                <div class="item-summary-item${rareClass}" title="${item.category} #${item.itemId}">
                     <img src="${item.texture}" alt="${item.category} #${item.itemId}">
                     <span class="item-summary-quantity">×${item.quantity}</span>
                 </div>

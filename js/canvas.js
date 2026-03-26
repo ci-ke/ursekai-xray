@@ -375,7 +375,7 @@ export function markPoint(point, fragment) {
     const isAggregated = point.isAggregated || false;
     const aggregatedCount = point.aggregatedCount || 1;
 
-    let ifContainRareItem = false;
+    const ifContainRareItem = doContainsRareItem(point.reward);
 
     // Only draw point marker if not hidden during drag
     if (color && !shouldHidePointMarker) {
@@ -398,12 +398,7 @@ export function markPoint(point, fragment) {
         domElements.ctx.beginPath();
         domElements.ctx.arc(displayX, displayY, innerRadius, 0, Math.PI * 2);
         domElements.ctx.fill();
-
-        ifContainRareItem = doContainsRareItem(point.reward);
-    } else if (color) {
-        // Point marker is hidden during drag, but still check for rare items for card styling
-        ifContainRareItem = doContainsRareItem(point.reward);
-    } else if (!shouldHidePointMarker) {
+    } else if (!color && !shouldHidePointMarker) {
         domElements.ctx.fillStyle = 'black';
         domElements.ctx.font = '12px Arial';
         domElements.ctx.fillText('?', displayX - 3, displayY + 4);

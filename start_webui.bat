@@ -5,4 +5,3 @@ echo Starting MySekai WebUI...
 echo.
 
 python webui.py
-pause

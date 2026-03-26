@@ -923,6 +923,16 @@ summary:hover {
     max-width: 350px;
 }
 
+.item-summary-item.super-rare {
+    background: rgba(197, 100, 119, 0.2);
+    border-color: rgba(197, 100, 119, 0.8);
+}
+
+.item-summary-item.rare {
+    background: rgba(88, 83, 135, 0.2);
+    border-color: rgba(88, 83, 135, 0.8);
+}
+
 .item-summary-empty {
     color: #999;
     font-style: italic;
