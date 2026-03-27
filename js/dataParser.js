@@ -142,6 +142,13 @@ export function parseMapDataStandard(gameData) {
     const harvestMaps = gameData.updatedResources.userMysekaiHarvestMaps;
     logger(`Found ${harvestMaps.length} scenes`);
 
+    // Extract owned music record IDs
+    const musicRecords = gameData.updatedResources.userMysekaiMusicRecords || [];
+    sceneState.ownedMusicRecordIds = new Set(musicRecords.map(r => String(r.mysekaiMusicRecordId)));
+    if (musicRecords.length > 0) {
+        logger(`Found ${musicRecords.length} owned music records`);
+    }
+
     const processedMap = {};
 
     harvestMaps.forEach((mp) => {

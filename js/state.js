@@ -16,6 +16,7 @@ export const sceneState = {
     harvestData: {},
     lastUpdateTime: 0,
     dataLoadedFromFile: false,
+    ownedMusicRecordIds: new Set(), // mysekaiMusicRecordIds the player already owns
 };
 
 // Filter state

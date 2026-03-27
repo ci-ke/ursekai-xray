@@ -179,7 +179,7 @@ export const ITEM_TEXTURES = {
         "483": "./icon/Texture2D/mdl_non1001_before_sprout1_483.png"
     },
     mysekai_music_record: {
-        "352": "./icon/Texture2D/item_surplus_music_record.png"
+        "*": "./icon/Texture2D/item_surplus_music_record.png"
     }
 };
 

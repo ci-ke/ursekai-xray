@@ -914,17 +914,45 @@ summary:hover {
 }
 
 .item-summary-music-title {
+    display: flex;
+    align-items: center;
+    gap: 4px;
     font-weight: 500;
     color: var(--primary);
     font-size: 0.85rem;
-    white-space: nowrap;
+    min-width: 0;
+}
+
+.music-title-text {
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 280px;
+    white-space: nowrap;
+    min-width: 0;
+}
+
+.music-owned-badge {
+    display: inline-block;
+    font-size: 0.7rem;
+    font-weight: 700;
+    padding: 1px 5px;
+    border-radius: 4px;
+    margin-left: 4px;
+    vertical-align: middle;
+}
+
+.music-owned-badge.owned {
+    background: rgba(23, 91, 145, 0.15);
+    color: var(--primary);
+    border: 1px solid var(--primary);
+}
+
+.music-owned-badge.new {
+    background: rgba(197, 100, 119, 0.15);
+    color: #c56477;
+    border: 1px solid #c56477;
 }
 
 .item-summary-item.music-record {
-    min-width: 200px;
     max-width: 350px;
 }
 

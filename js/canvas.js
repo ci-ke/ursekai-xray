@@ -4,7 +4,7 @@
  */
 
 import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM } from './config.js';
-import { domElements, canvasState, domLayoutState, canvasOptimizationState, aggregationState, dragState, displayModeState } from './state.js';
+import { domElements, canvasState, domLayoutState, canvasOptimizationState, aggregationState, dragState, displayModeState, sceneState } from './state.js';
 import { shouldShowItem } from './filters.js';
 
 /**
@@ -352,7 +352,7 @@ export function markPoint(point, fragment) {
     const displayX = canvasState.xDirection === 'x+' ? originX + x * displayGridWidth : originX - x * displayGridWidth;
     const displayY = canvasState.yDirection === 'y+' ? originY + y * displayGridWidth : originY - y * displayGridWidth;
 
-    // Check if this location has items user wants to see
+    // Check if this location has items user wants to see (for card display only)
     let hasVisibleItems = false;
     for (const category in point.reward) {
         if (!point.reward.hasOwnProperty(category)) continue;
@@ -364,11 +364,6 @@ export function markPoint(point, fragment) {
             }
         }
         if (hasVisibleItems) break;
-    }
-
-    // If no visible items and not showing all, skip this point
-    if (!hasVisibleItems) {
-        return;
     }
 
     const color = FIXTURE_COLORS[point.fixtureId];
@@ -518,6 +513,9 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
             itemImage.dataset.category = category;
             itemImage.dataset.itemId = itemId;
             itemImage.dataset.quantity = quantity;
+            if (category === 'mysekai_music_record') {
+                itemImage.dataset.musicOwned = sceneState.ownedMusicRecordIds.has(String(itemId)) ? 'owned' : 'new';
+            }
 
             // Scale image size using CSS variable base to stay in sync with device profile
             const rootStyles = getComputedStyle(document.documentElement);

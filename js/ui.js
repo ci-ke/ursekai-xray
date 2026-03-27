@@ -14,7 +14,7 @@ let lastTouchPreviewTime = 0;
 let musicRecordMap = {};
 let musicDataLoaded = false;
 import { initCanvas, drawGrid, markPoint, displayReward, processPendingItemPositions, adjustItemListPositions, clearItemLists, clearDirtyRegions, calculateDirtyRegions, clearGrid, aggregatePoints } from './canvas.js';
-import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback } from './filters.js';
+import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback, initializeItemCheckboxes } from './filters.js';
 import { handleFileUpload, processJsonFile } from './dataParser.js';
 import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas } from './dragInteraction.js';
 
@@ -498,6 +498,9 @@ function onDataLoaded(result) {
     sceneState.lastUpdateTime = Date.now() / 1000;
     sceneState.dataLoadedFromFile = true;
 
+    // Rebuild custom filter checkboxes based on actual items in data
+    initializeItemCheckboxes();
+
     // Update UI
     updateSceneButtonStatus();
     parseAndMarkPoints();
@@ -583,7 +586,10 @@ export function initializeImagePreviewDelegation() {
             const category = e.target.dataset.category;
             const itemId = e.target.dataset.itemId;
             const quantity = e.target.dataset.quantity;
-            const itemName = `${category} #${itemId}${quantity ? ' ×' + quantity : ''}`;
+            let itemName = `${category} #${itemId}${quantity ? ' ×' + quantity : ''}`;
+            if (category === 'mysekai_music_record' && e.target.dataset.musicOwned) {
+                itemName += e.target.dataset.musicOwned === 'owned' ? ' [owned]' : ' [new]';
+            }
             showItemPreview(e.target.src, itemName, e.clientX, e.clientY);
         }
     });
@@ -799,30 +805,25 @@ export function updateItemSummary() {
 
                 const quantity = point.reward[category][itemId];
 
-                // Special handling for music records: don't aggregate if music data is loaded
-                if (category === "mysekai_music_record" && musicDataLoaded) {
-                    // Create unique key for each music record to prevent aggregation
+                // Special handling for music records: always show individually (no aggregation)
+                if (category === "mysekai_music_record") {
                     const uniqueKey = `${category}_${itemId}_${pointIndex}`;
-                    const musicData = musicRecordMap[itemId];
-                    
+                    const musicData = musicDataLoaded ? musicRecordMap[itemId] : null;
+
                     itemMap[uniqueKey] = {
                         texture: './icon/Texture2D/item_surplus_music_record.png',
                         quantity: quantity,
                         category: category,
                         itemId: itemId,
-                        musicTitle: musicData ? `#${itemId}: ${musicData.externalId} ${musicData.title}` : `#${itemId}: Unknown`,
+                        musicTitle: musicData ? `#${itemId}:${musicData.externalId} ${musicData.title}` : null,
                         externalId: musicData?.externalId
                     };
                 } else {
-                    // Normal aggregation for other items (and music records if data not loaded)
+                    // Normal aggregation for other items
                     const key = `${category}_${itemId}`;
 
                     if (!itemMap[key]) {
-                        let texture = ITEM_TEXTURES[category]?.[itemId] || './icon/missing.png';
-                        if (category === "mysekai_music_record") {
-                            texture = './icon/Texture2D/item_surplus_music_record.png';
-                        }
-
+                        const texture = ITEM_TEXTURES[category]?.[itemId] || './icon/missing.png';
                         itemMap[key] = {
                             texture: texture,
                             quantity: 0,
@@ -863,15 +864,30 @@ export function updateItemSummary() {
         const isRare      = doContainsRareItem({ [item.category]: { [item.itemId]: 1 } }, false);
         const rareClass   = isSuperRare ? ' super-rare' : (isRare ? ' rare' : '');
 
-        // Special rendering for music records with loaded data
-        if (item.category === "mysekai_music_record" && item.musicTitle) {
-            const tooltipText = `${item.category} #${item.itemId} - ${item.musicTitle}`;
-            html += `
-                <div class="item-summary-item music-record${rareClass}" title="${tooltipText}">
-                    <img src="${item.texture}" alt="${item.musicTitle}">
-                    <span class="item-summary-music-title">${item.musicTitle}</span>
-                </div>
-            `;
+        // Special rendering for music records
+        if (item.category === "mysekai_music_record") {
+            const isOwned = sceneState.ownedMusicRecordIds.has(String(item.itemId));
+            const ownedLabel = isOwned
+                ? '<span class="music-owned-badge owned">owned</span>'
+                : '<span class="music-owned-badge new">new</span>';
+            if (item.musicTitle) {
+                // data loaded: "#id: externalId title [owned/new]"
+                const tooltipText = `${item.category} #${item.itemId} - ${item.musicTitle}`;
+                html += `
+                    <div class="item-summary-item music-record${rareClass}" title="${tooltipText}">
+                        <img src="${item.texture}" alt="${item.musicTitle}">
+                        <span class="item-summary-music-title"><span class="music-title-text">${item.musicTitle}</span>${ownedLabel}</span>
+                    </div>
+                `;
+            } else {
+                // data not loaded: "#id [owned/new]"
+                html += `
+                    <div class="item-summary-item music-record${rareClass}" title="${item.category} #${item.itemId}">
+                        <img src="${item.texture}" alt="${item.category} #${item.itemId}">
+                        <span class="item-summary-music-title"><span class="music-title-text">#${item.itemId}</span>${ownedLabel}</span>
+                    </div>
+                `;
+            }
         } else {
             html += `
                 <div class="item-summary-item${rareClass}" title="${item.category} #${item.itemId}">
