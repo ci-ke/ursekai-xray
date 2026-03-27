@@ -517,6 +517,7 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
             // Store data attributes for event delegation
             itemImage.dataset.category = category;
             itemImage.dataset.itemId = itemId;
+            itemImage.dataset.quantity = quantity;
 
             // Scale image size using CSS variable base to stay in sync with device profile
             const rootStyles = getComputedStyle(document.documentElement);

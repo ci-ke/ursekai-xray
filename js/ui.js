@@ -582,7 +582,8 @@ export function initializeImagePreviewDelegation() {
         if (e.target.tagName === 'IMG' && e.target.dataset.category) {
             const category = e.target.dataset.category;
             const itemId = e.target.dataset.itemId;
-            const itemName = `${category} #${itemId}`;
+            const quantity = e.target.dataset.quantity;
+            const itemName = `${category} #${itemId}${quantity ? ' ×' + quantity : ''}`;
             showItemPreview(e.target.src, itemName, e.clientX, e.clientY);
         }
     });
