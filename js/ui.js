@@ -356,7 +356,11 @@ function createItemPreview() {
  */
 export function showItemPreview(imgSrc, itemName, mouseX, mouseY, options = {}) {
     const preview = createItemPreview();
-    preview.innerHTML = `<img src="${imgSrc}" onerror="this.style.display='none'">`;
+    let html = `<img src="${imgSrc}" onerror="this.style.display='none'">`;
+    if (itemName) {
+        html += `<div class="item-preview-name">${itemName}</div>`;
+    }
+    preview.innerHTML = html;
     preview.classList.add('active');
 
     // Position preview with bounds checks to avoid clipping on mobile
@@ -578,8 +582,8 @@ export function initializeImagePreviewDelegation() {
         if (e.target.tagName === 'IMG' && e.target.dataset.category) {
             const category = e.target.dataset.category;
             const itemId = e.target.dataset.itemId;
-            const label = formatPreviewLabel(category, itemId);
-            showItemPreview(e.target.src, label, e.clientX, e.clientY);
+            const itemName = `${category} #${itemId}`;
+            showItemPreview(e.target.src, itemName, e.clientX, e.clientY);
         }
     });
 
