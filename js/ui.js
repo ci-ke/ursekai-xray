@@ -215,7 +215,7 @@ export function parseAndMarkPoints() {
         if (!canvasState.reverseXY) {
             displayPoints.forEach(point => markPoint(point, fragment));
         } else {
-            displayPoints.forEach(point => markPoint({location: [point.location[1], point.location[0]], fixtureId: point.fixtureId, reward: point.reward, isAggregated: point.isAggregated, aggregatedCount: point.aggregatedCount, aggregationKey: point.aggregationKey, aggregatedIndices: point.aggregatedIndices, isAggregationLeader: point.isAggregationLeader}, fragment));
+            displayPoints.forEach(point => markPoint({ location: [point.location[1], point.location[0]], fixtureId: point.fixtureId, reward: point.reward, isAggregated: point.isAggregated, aggregatedCount: point.aggregatedCount, aggregationKey: point.aggregationKey, aggregatedIndices: point.aggregatedIndices, isAggregationLeader: point.isAggregationLeader }, fragment));
         }
         document.querySelector('.image-container').appendChild(fragment);
 
@@ -851,18 +851,18 @@ export function updateItemSummary() {
     const sortedItems = Object.values(itemMap).sort((a, b) => {
         const aSuper = doContainsRareItem({ [a.category]: { [a.itemId]: 1 } }, true);
         const bSuper = doContainsRareItem({ [b.category]: { [b.itemId]: 1 } }, true);
-        const aRare  = doContainsRareItem({ [a.category]: { [a.itemId]: 1 } }, false);
-        const bRare  = doContainsRareItem({ [b.category]: { [b.itemId]: 1 } }, false);
+        const aRare = doContainsRareItem({ [a.category]: { [a.itemId]: 1 } }, false);
+        const bRare = doContainsRareItem({ [b.category]: { [b.itemId]: 1 } }, false);
         if (aSuper !== bSuper) return aSuper ? -1 : 1;
-        if (aRare  !== bRare)  return aRare  ? -1 : 1;
+        if (aRare !== bRare) return aRare ? -1 : 1;
         if (a.category !== b.category) return a.category.localeCompare(b.category);
         return a.itemId - b.itemId;
     });
 
     sortedItems.forEach(item => {
         const isSuperRare = doContainsRareItem({ [item.category]: { [item.itemId]: 1 } }, true);
-        const isRare      = doContainsRareItem({ [item.category]: { [item.itemId]: 1 } }, false);
-        const rareClass   = isSuperRare ? ' super-rare' : (isRare ? ' rare' : '');
+        const isRare = doContainsRareItem({ [item.category]: { [item.itemId]: 1 } }, false);
+        const rareClass = isSuperRare ? ' super-rare' : (isRare ? ' rare' : '');
 
         // Special rendering for music records
         if (item.category === "mysekai_music_record") {
@@ -905,7 +905,7 @@ export function updateItemSummary() {
 /**
  * Initialize all UI on page load
  */
-export function initializeUI() {
+export async function initializeUI() {
     // Initialize DOM element references
     domElements.image = document.getElementById('image');
     domElements.canvas = document.getElementById('gridCanvas');
@@ -938,6 +938,26 @@ export function initializeUI() {
 
     // Initialize first scene (this will load image and set up canvas)
     selectScene('scene1');
+
+    // Try to auto-load mysekai_data.json; only show upload modal if not found
+    try {
+        const response = await fetch('mysekai_data.json');
+        if (response.ok) {
+            const content = await response.text();
+            const result = processJsonFile(content, 'mysekai_data.json');
+            if (result.success) {
+                onDataLoaded(result);
+                logger('Auto-loaded mysekai_data.json');
+                return; // Skip upload modal
+            }
+        }
+        else {
+            logger('Fail to load local json');
+        }
+    } catch (e) {
+        // File not present or fetch failed, fall through to upload modal
+        logger('Error loading local json');
+    }
 
     // Show upload modal on page load
     openDropZoneModal();

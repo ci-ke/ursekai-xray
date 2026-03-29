@@ -339,7 +339,7 @@ export function clearDirtyRegions() {
 export function markPoint(point, fragment) {
     // Check if this is an aggregated point that should be hidden during drag
     const shouldHidePointMarker = dragState.hiddenOriginalPointIndices.length > 0 && point.isAggregated && point.aggregatedIndices &&
-                                   point.aggregatedIndices.some(idx => dragState.hiddenOriginalPointIndices.includes(idx));
+        point.aggregatedIndices.some(idx => dragState.hiddenOriginalPointIndices.includes(idx));
 
     const [x, y] = point.location;
     const offsetScale = getImageScale() || 1;

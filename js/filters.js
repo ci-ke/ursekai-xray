@@ -149,7 +149,7 @@ export function initializeItemCheckboxes() {
         const img = document.createElement('img');
         img.src = item.path;
         img.alt = titleText;
-        img.onerror = function() { this.src = './icon/missing.png'; };
+        img.onerror = function () { this.src = './icon/missing.png'; };
 
         label.appendChild(img);
         checkbox.appendChild(input);

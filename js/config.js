@@ -40,7 +40,7 @@ export const SCENES = {
 
 // Fixture color mapping for different fixture types
 export const FIXTURE_COLORS = {
-    112:  '#f9f9f9',
+    112: '#f9f9f9',
 
     1001: '#8B6F47', // wood
     1002: '#8B6F47',

@@ -213,39 +213,7 @@ export function parseMapData(gameData) {
     }
 }
 
-/**
- * Load data from local mysekai_data.json file
- */
-export async function loadLocalData() {
-    logger('Loading mysekai_data.json...');
-    try {
-        const response = await fetch('mysekai_data.json');
 
-        if (!response.ok) {
-            throw new Error(`HTTP error: ${response.status} ${response.statusText}`);
-        }
-
-        const gameData = await response.json();
-
-        sceneState.harvestData = parseMapData(gameData);
-        sceneState.lastUpdateTime = Date.now() / 1000;
-
-        const sceneNames = Object.keys(sceneState.harvestData);
-        if (sceneNames.length === 0) {
-            logger('Warning: No scene data loaded');
-        } else {
-            logger('Data loaded: ' + sceneNames.join(', '));
-        }
-
-        // Update button states
-        updateSceneButtonStatus();
-
-        // Auto-mark points on current scene
-        parseAndMarkPoints();
-    } catch (error) {
-        logger('Error loading data: ' + error.message);
-    }
-}
 
 /**
  * Parse custom mixed format (Site name + JSON array lines)
