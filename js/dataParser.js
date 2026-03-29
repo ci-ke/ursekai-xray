@@ -285,6 +285,7 @@ export function processJsonFile(content, fileName) {
                 data: parsedData,
                 parseMethod,
                 fileName,
+                rawContent: content,
                 sceneNames
             };
         } catch (error) {

@@ -283,6 +283,9 @@ export function selectScene(sceneKey) {
     const selectedScene = SCENES[sceneKey];
 
     if (selectedScene) {
+        // Persist current scene for next page load
+        try { localStorage.setItem('lastScene', sceneKey); } catch (e) {}
+
         // Update button state
         document.querySelectorAll('.scene-buttons button').forEach(btn => {
             btn.classList.remove('active');
@@ -497,6 +500,17 @@ function onDataLoaded(result) {
     sceneState.harvestData = result.data;
     sceneState.lastUpdateTime = Date.now() / 1000;
     sceneState.dataLoadedFromFile = true;
+
+    // Cache raw content to localStorage for next page load
+    // mysekai_data.json is always re-fetched directly, so skip caching it
+    if (result.rawContent && result.fileName !== 'mysekai_data.json') {
+        try {
+            localStorage.setItem('cachedDataContent', result.rawContent);
+            localStorage.setItem('cachedDataFileName', result.fileName);
+        } catch (e) {
+            // localStorage may be full or unavailable, ignore
+        }
+    }
 
     // Rebuild custom filter checkboxes based on actual items in data
     initializeItemCheckboxes();
@@ -939,10 +953,11 @@ export async function initializeUI() {
     initializeImagePreviewDelegation();
     initializeDragInteraction();
 
-    // Initialize first scene (this will load image and set up canvas)
-    selectScene('scene1');
+    // Initialize first scene, restore last visited scene if available
+    const lastScene = localStorage.getItem('lastScene') || 'scene1';
+    selectScene(lastScene);
 
-    // Try to auto-load mysekai_data.json; only show upload modal if not found
+    // Try to auto-load mysekai_data.json first (highest priority, not cached)
     try {
         const response = await fetch('mysekai_data.json');
         if (response.ok) {
@@ -954,14 +969,27 @@ export async function initializeUI() {
                 return; // Skip upload modal
             }
         }
-        else {
-            logger('Fail to load local json');
-        }
     } catch (e) {
-        // File not present or fetch failed, fall through to upload modal
-        logger('Error loading local json');
+        // File not present or fetch failed, fall through to cache
     }
 
+    // Try to restore from localStorage cache
+    try {
+        const cachedContent = localStorage.getItem('cachedDataContent');
+        const cachedFileName = localStorage.getItem('cachedDataFileName') || 'cached data';
+        if (cachedContent) {
+            const result = processJsonFile(cachedContent, cachedFileName);
+            if (result.success) {
+                onDataLoaded(result);
+                logger(`Restored from cache: ${cachedFileName}`);
+                return;
+            }
+        }
+    } catch (e) {
+        // localStorage unavailable, continue
+    }
+
+    logger('Fail to load local json');
     // Show upload modal on page load
     openDropZoneModal();
 }
