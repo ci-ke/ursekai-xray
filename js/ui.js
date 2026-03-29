@@ -16,7 +16,7 @@ let musicDataLoaded = false;
 import { initCanvas, drawGrid, markPoint, displayReward, processPendingItemPositions, adjustItemListPositions, clearItemLists, clearDirtyRegions, calculateDirtyRegions, clearGrid, aggregatePoints } from './canvas.js';
 import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback, initializeItemCheckboxes } from './filters.js';
 import { handleFileUpload, processJsonFile } from './dataParser.js';
-import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas } from './dragInteraction.js';
+import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas, clearPersistedLines } from './dragInteraction.js';
 
 /**
  * Log messages to UI
@@ -921,7 +921,10 @@ export async function initializeUI() {
     displayModeState.init();
 
     // Set up callback for filter changes
-    setFilterChangeCallback(parseAndMarkPoints);
+    setFilterChangeCallback(() => {
+        clearPersistedLines();
+        parseAndMarkPoints();
+    });
 
     // Load music data for music record display
     loadMusicData();

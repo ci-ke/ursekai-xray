@@ -654,6 +654,9 @@ export function processPendingItemPositions() {
             if (finalTop < 0) finalTop = margin;
             if (finalLeft < 0) finalLeft = margin;
 
+            // Skip cards that have been manually moved by the user
+            if (itemList.dataset.userMoved === 'true') return;
+
             // Use transform for compositing performance (compatible with scaling)
             itemList.style.left = '0px';
             itemList.style.top = '0px';
@@ -703,6 +706,8 @@ function resolveItemCollision(itemList2, rect1, rect2, maxLapWidth, maxLapHeight
     const overlapHeight = Math.min(rect1.bottom, rect2.bottom) - Math.max(rect1.top, rect2.top);
 
     if (overlapWidth > 0 && overlapHeight > 0 && (overlapWidth > maxLapWidth || overlapHeight > maxLapHeight)) {
+        // Skip cards manually moved by the user
+        if (itemList2.dataset.userMoved === 'true') return;
         const transform = itemList2.style.transform;
         const translateMatch = transform.match(/translate\(([^,]+)px,\s*([^)]+)px\)/);
         const currentX = translateMatch ? parseFloat(translateMatch[1]) : 0;

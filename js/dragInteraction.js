@@ -12,6 +12,10 @@ let overlayCanvas = null;
 let overlayCtx = null;
 let currentScene = 'scene1';
 
+// Persisted connection lines for cards that have been moved
+// Each entry: { card, harvestPoints, isAggregatedCard, fixtureId }
+let persistedLines = [];
+
 /**
  * Initialize drag interaction for all item cards
  */
@@ -294,7 +298,8 @@ function handleCardPointerMove(e) {
     // Show overlay and draw connection lines
     if (overlayCanvas) {
         overlayCanvas.style.display = 'block';
-        drawConnectionLines();
+        drawAllPersistedLines();
+        drawConnectionLines(true);
     }
 }
 
@@ -312,20 +317,30 @@ function handleCardPointerUp(e) {
     dragState.isDragging = false;
     const card = dragState.draggedCard;
 
-    // Restore original position
-    card.style.transform = dragState.originalPosition || 'translate(0px, 0px)';
+    // Mark card as user-moved so position layout won't reset it
+    card.dataset.userMoved = 'true';
+
+    // Save connection line data for this card before clearing dragState
+    // Remove any existing entry for this card first, then add updated one
+    persistedLines = persistedLines.filter(l => l.card !== card);
+    persistedLines.push({
+        card,
+        harvestPoints: [...dragState.harvestPoints],
+        isAggregatedCard: dragState.isAggregatedCard,
+        fixtureId: dragState.fixtureId
+    });
+
+    // Keep card at its dragged position (do not restore original position)
     card.style.cursor = 'grab';
     card.style.zIndex = 1;
 
     // Hide any active item preview tooltip
     hideItemPreview();
 
-    // Hide overlay canvas
+    // Redraw overlay with all persisted lines (keep overlay visible)
     if (overlayCanvas) {
-        overlayCanvas.style.display = 'none';
-        if (overlayCtx) {
-            overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
-        }
+        overlayCanvas.style.display = 'block';
+        drawAllPersistedLines();
     }
 
     // Release pointer capture to avoid stuck states on touch devices
@@ -455,11 +470,11 @@ function gameToScreenCoordinates(gameX, gameY) {
 /**
  * Draw connection lines from dragged card to harvest points
  */
-function drawConnectionLines() {
+function drawConnectionLines(skipClear = false) {
     if (!overlayCanvas || !overlayCtx) return;
 
-    // Clear previous drawing
-    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+    // Clear previous drawing (skip if caller already cleared)
+    if (!skipClear) overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
     // Get card element
     const cardElement = dragState.draggedCard;
@@ -590,8 +605,55 @@ function drawConnectionLines() {
 }
 
 /**
+ * Draw all persisted connection lines (for cards that have been moved)
+ */
+function drawAllPersistedLines() {
+    if (!overlayCtx) return;
+    overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+
+    persistedLines.forEach(({ card, harvestPoints, isAggregatedCard, fixtureId }) => {
+        // Temporarily populate dragState-like data to reuse drawConnectionLines logic
+        const saved = {
+            draggedCard: dragState.draggedCard,
+            harvestPoints: dragState.harvestPoints,
+            isAggregatedCard: dragState.isAggregatedCard,
+            fixtureId: dragState.fixtureId
+        };
+
+        dragState.draggedCard = card;
+        dragState.harvestPoints = harvestPoints.map(p => ({ ...p }));
+        dragState.isAggregatedCard = isAggregatedCard;
+        dragState.fixtureId = fixtureId;
+
+        drawConnectionLines(true); // true = skip clearing canvas
+
+        dragState.draggedCard = saved.draggedCard;
+        dragState.harvestPoints = saved.harvestPoints;
+        dragState.isAggregatedCard = saved.isAggregatedCard;
+        dragState.fixtureId = saved.fixtureId;
+    });
+}
+
+/**
+ * Clear all persisted connection lines (e.g. after filter change)
+ */
+export function clearPersistedLines() {
+    persistedLines = [];
+    if (overlayCanvas && overlayCtx) {
+        overlayCanvas.style.display = 'none';
+        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+    }
+}
+
+/**
  * Set current scene (called from ui.js)
  */
 export function setCurrentScene(sceneKey) {
     currentScene = sceneKey;
+    // Clear persisted lines when switching scenes (cards will be re-rendered)
+    persistedLines = [];
+    if (overlayCanvas && overlayCtx) {
+        overlayCanvas.style.display = 'none';
+        overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
+    }
 }
