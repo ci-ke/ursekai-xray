@@ -520,6 +520,7 @@ function onDataLoaded(result) {
     parseAndMarkPoints();
     closeDropZoneModal();
     showDataLoadedIndicator(result.fileName);
+    clearPersistedLines();
 
     // Start background preload of all textures after data is loaded
     preloadAllTexturesInBackground();
