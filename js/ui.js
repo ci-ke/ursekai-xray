@@ -1074,5 +1074,39 @@ window.closeDropZoneModal = closeDropZoneModal;
 window.setDisplayMode = setDisplayMode;
 window.displayModeState = displayModeState;
 
+/**
+ * Set background overlay on the map image container
+ * @param {string} value - 'off' | 'white-25' | 'white-50' | 'white-75' | 'white-100' | 'black-25' | 'black-50' | 'black-75' | 'black-100'
+ */
+function setBgOverlay(value) {
+    const imageContainer = document.querySelector('.image-container');
+    if (!imageContainer) return;
+
+    let overlay = document.getElementById('map-bg-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'map-bg-overlay';
+        // Insert as second child so it sits above the <img> but below cards
+        const img = imageContainer.querySelector('img');
+        if (img && img.nextSibling) {
+            imageContainer.insertBefore(overlay, img.nextSibling);
+        } else {
+            imageContainer.appendChild(overlay);
+        }
+    }
+
+    if (value === 'off') {
+        overlay.style.display = 'none';
+        return;
+    }
+
+    const [color, pct] = value.split('-');
+    const alpha = parseInt(pct) / 100;
+    const rgb = color === 'white' ? '255,255,255' : '0,0,0';
+    overlay.style.background = `rgba(${rgb},${alpha})`;
+    overlay.style.display = 'block';
+}
+window.setBgOverlay = setBgOverlay;
+
 // Note: initializeUI, changeFilterMode, and toggleFilterPanel are already exported
 // as named exports via 'export function' declarations above

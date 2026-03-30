@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,6 +11,7 @@
     <!-- config.js is now imported as an ES6 module from ui.js -->
     <script type="module" src="js/ui.js"></script>
 </head>
+
 <body>
     <!-- Drop Zone Modal -->
     <div class="drop-zone-backdrop hidden" id="dropZoneBackdrop">
@@ -56,9 +58,39 @@
             <button onclick="window.selectScene?.('scene3')" data-scene="scene3">願いの砂浜</button>
             <button onclick="window.selectScene?.('scene4')" data-scene="scene4">忘れ去られた場所</button>
         </div>
-        <br>
+        <select id="bgOverlaySelect" onchange="window.setBgOverlay?.(this.value)">
+            <option value="off">BG: off</option>
+            <option value="black-25">25% black</option>
+            <option value="black-50">50% black</option>
+            <option value="black-75">75% black</option>
+            <option value="black-100">100% black</option>
+            <option value="white-25">25% white</option>
+            <option value="white-50">50% white</option>
+            <option value="white-75">75% white</option>
+            <option value="white-100">100% white</option>
+        </select>
         <button class="filter-button" onclick="window.openDropZoneModal?.()">📤 Load Data File</button>
         <button class="filter-button" onclick="window.toggleFilterPanel?.()">🔍 Filter Items</button>
+        <div class="filter-panel" id="filterPanel">
+            <div class="filter-options">
+                <div class="filter-option">
+                    <input type="radio" id="filterAll" name="filterMode" value="all" checked
+                        onchange="window.changeFilterMode?.()">
+                    <label for="filterAll">Show All Items</label>
+                </div>
+                <div class="filter-option">
+                    <input type="radio" id="filterRare" name="filterMode" value="rare"
+                        onchange="window.changeFilterMode?.()">
+                    <label for="filterRare">Show Rare Items Only</label>
+                </div>
+                <div class="filter-option">
+                    <input type="radio" id="filterCustom" name="filterMode" value="custom"
+                        onchange="window.changeFilterMode?.()">
+                    <label for="filterCustom">Show Custom Selected Items</label>
+                </div>
+            </div>
+            <div id="itemCheckboxContainer" class="item-checkbox-list"></div>
+        </div>
         <div class="display-mode-toggle">
             <label>Display Mode:</label>
             <div class="toggle-buttons">
@@ -70,35 +102,12 @@
                 </button>
             </div>
         </div>
-        <a
-            class="external-link"
-            href="https://endoretic.github.io/pjsk-gatecalculator/"
-            target="_blank"
-            rel="noopener"
-        >ゲート素材計算機 | Material Planner</a>
+        <a class="external-link" href="https://endoretic.github.io/pjsk-gatecalculator/" target="_blank"
+            rel="noopener">ゲート素材計算機 | Material Planner</a>
 
-
-        <div class="filter-panel" id="filterPanel">
-            <div class="filter-options">
-                <div class="filter-option">
-                    <input type="radio" id="filterAll" name="filterMode" value="all" checked onchange="window.changeFilterMode?.()">
-                    <label for="filterAll">Show All Items</label>
-                </div>
-                <div class="filter-option">
-                    <input type="radio" id="filterRare" name="filterMode" value="rare" onchange="window.changeFilterMode?.()">
-                    <label for="filterRare">Show Rare Items Only</label>
-                </div>
-                <div class="filter-option">
-                    <input type="radio" id="filterCustom" name="filterMode" value="custom" onchange="window.changeFilterMode?.()">
-                    <label for="filterCustom">Show Custom Selected Items</label>
-                </div>
-            </div>
-            <div id="itemCheckboxContainer" class="item-checkbox-list"></div>
-        </div>
         <div class="log-container">
             <div class="log-scroll" id="logContainer"></div>
         </div>
-        <br>
         <details>
             <summary>Advance Settings</summary>
             <label for="physicalWidth">Grid Width(px):</label>
@@ -119,4 +128,5 @@
         </details>
     </div>
 </body>
+
 </html>
