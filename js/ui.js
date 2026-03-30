@@ -284,7 +284,7 @@ export function selectScene(sceneKey) {
 
     if (selectedScene) {
         // Persist current scene for next page load
-        try { localStorage.setItem('lastScene', sceneKey); } catch (e) {}
+        try { localStorage.setItem('lastScene', sceneKey); } catch (e) { }
 
         // Update button state
         document.querySelectorAll('.scene-buttons button').forEach(btn => {
@@ -1037,6 +1037,9 @@ export function setDisplayMode(mode) {
         // Update button UI
         updateDisplayModeButtonUI();
 
+        // Clear persisted connection lines before re-render
+        clearPersistedLines();
+
         // Re-render with new display mode
         parseAndMarkPoints();
         logger(`Display mode changed to: ${mode === 'all' ? 'All Cards' : 'Aggregated (β)'}`);
@@ -1061,7 +1064,7 @@ window.logger = logger;
 window.selectScene = selectScene;
 window.setDirection = setDirection;
 window.drawGrid = drawGrid;
-window.clearGrid = clearGrid;
+window.clearGrid = () => { clearPersistedLines(); clearGrid(); };
 window.toggleFilterPanel = toggleFilterPanel;
 window.changeFilterMode = changeFilterMode;
 window.toggleSidebar = toggleSidebar;

@@ -130,7 +130,7 @@ function createOverlayCanvas() {
     overlayCanvas.style.top = '0';
     overlayCanvas.style.left = '0';
     overlayCanvas.style.cursor = 'grabbing';
-    overlayCanvas.style.zIndex = '10000';
+    overlayCanvas.style.zIndex = '100';
     overlayCanvas.style.display = 'none';
     overlayCanvas.style.pointerEvents = 'none';
 
