@@ -1,4 +1,4 @@
-# pjsk-mysekai-xray
+# ursekai
 
 A goldminer, visualizer, a cheater (or anything you'd like to call) for ur sekai.
 
@@ -12,7 +12,7 @@ Please refer to <https://github.com/mos9527/sssekai> or <https://github.com/Huac
 
 ## How to Start
 
-<https://endoretic.github.io/ursekai-xray/>. (Or run `start_webui.bat` to start a local server)
+<https://ci-ke.github.io/ursekai/>. (Or run `start_webui.bat` to start a local server)
 
 ## Supported Scenes
 
