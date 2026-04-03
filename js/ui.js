@@ -1060,6 +1060,44 @@ window.addEventListener('orientationchange', () => {
 // Initialize on page load
 window.addEventListener('load', initializeUI);
 
+/**
+ * Clear loaded JSON data and reset to initial state
+ */
+export function clearLoadedData() {
+    // Clear harvest data
+    sceneState.harvestData = {};
+    sceneState.dataLoadedFromFile = false;
+
+    // Clear localStorage cache
+    try {
+        localStorage.removeItem('cachedDataContent');
+        localStorage.removeItem('cachedDataFileName');
+    } catch (e) {
+        // Ignore if localStorage is unavailable
+    }
+
+    // Clear canvas and UI
+    clearGrid();
+    clearItemLists();
+    clearPersistedLines();
+
+    // Reset item summary
+    const summaryContainer = document.getElementById('itemSummary');
+    if (summaryContainer) {
+        summaryContainer.innerHTML = '<div class="item-summary-empty">No data loaded</div>';
+    }
+
+    // Update scene buttons (remove super-rare indicators)
+    document.querySelectorAll('.scene-buttons button').forEach(btn => {
+        btn.classList.remove('super-rare');
+    });
+
+    logger('Data cleared. Please load a new data file.');
+
+    // Show upload modal
+    openDropZoneModal();
+}
+
 // Export functions to window for HTML onclick handlers and global access
 window.logger = logger;
 window.selectScene = selectScene;
@@ -1074,6 +1112,7 @@ window.openDropZoneModal = openDropZoneModal;
 window.closeDropZoneModal = closeDropZoneModal;
 window.setDisplayMode = setDisplayMode;
 window.displayModeState = displayModeState;
+window.clearLoadedData = clearLoadedData;
 
 /**
  * Set background overlay on the map image container
