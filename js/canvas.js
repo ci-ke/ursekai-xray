@@ -312,8 +312,8 @@ export function calculateDirtyRegions(newPoints) {
         }
     });
 
-    // If no dirty regions but point count changed, full redraw
-    if (canvasOptimizationState.dirtyRegions.length === 0 && newPoints.length !== canvasOptimizationState.lastRenderedPoints.length) {
+    // If no dirty regions, always do a full redraw (covers filter changes, count changes, etc.)
+    if (canvasOptimizationState.dirtyRegions.length === 0) {
         return false; // Signal full redraw needed
     }
 
