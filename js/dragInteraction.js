@@ -611,6 +611,13 @@ function drawAllPersistedLines() {
     if (!overlayCtx) return;
     overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
 
+    // Filter out stale references to cards that have been removed from the DOM.
+    // This happens on mobile when scrolling triggers a re-render (clearItemLists),
+    // which destroys old card elements while persistedLines still holds references to them.
+    // Calling getBoundingClientRect() on a detached element returns all-zero DOMRect,
+    // causing connection lines to point to a single spot near the top-left corner.
+    persistedLines = persistedLines.filter(({ card }) => document.contains(card));
+
     persistedLines.forEach(({ card, harvestPoints, isAggregatedCard, fixtureId }) => {
         // Temporarily populate dragState-like data to reuse drawConnectionLines logic
         const saved = {

@@ -1048,8 +1048,23 @@ export function setDisplayMode(mode) {
 }
 
 window.addEventListener('resize', () => {
-    // Delay increased to 400ms to avoid conflicts with sidebar CSS animations (0.3s)
-    scheduleViewportRefresh(400);
+    // On mobile, the browser address bar collapsing/expanding only changes the
+    // viewport height, not the width. Triggering a full re-render in that case
+    // resets manually-moved cards. Only do a full refresh when the width changes;
+    // for height-only changes just update canvas dimensions without rebuilding cards.
+    const newWidth = window.innerWidth;
+    if (newWidth !== domLayoutState.lastWindowWidth) {
+        domLayoutState.lastWindowWidth = newWidth;
+        // Delay increased to 400ms to avoid conflicts with sidebar CSS animations (0.3s)
+        scheduleViewportRefresh(400);
+    } else {
+        // Height-only change (address bar, soft keyboard): resize canvases silently
+        clearTimeout(resizeTimeout);
+        resizeTimeout = setTimeout(() => {
+            initCanvas();
+            refreshOverlayCanvas();
+        }, 400);
+    }
 });
 
 // Orientation changes on mobile can report as resize; handle explicitly for clarity
