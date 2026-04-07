@@ -16,7 +16,7 @@ let musicDataLoaded = false;
 import { initCanvas, drawGrid, markPoint, displayReward, processPendingItemPositions, adjustItemListPositions, clearItemLists, clearDirtyRegions, calculateDirtyRegions, clearGrid, aggregatePoints } from './canvas.js';
 import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback, initializeItemCheckboxes } from './filters.js';
 import { handleFileUpload, processJsonFile } from './dataParser.js';
-import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas, clearPersistedLines } from './dragInteraction.js';
+import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas, clearPersistedLines, redrawPersistedLines } from './dragInteraction.js';
 
 /**
  * Log messages to UI
@@ -1063,6 +1063,7 @@ window.addEventListener('resize', () => {
         resizeTimeout = setTimeout(() => {
             initCanvas();
             refreshOverlayCanvas();
+            redrawPersistedLines();
         }, 400);
     }
 });

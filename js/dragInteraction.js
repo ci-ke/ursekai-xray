@@ -607,6 +607,13 @@ function drawConnectionLines(skipClear = false) {
 /**
  * Draw all persisted connection lines (for cards that have been moved)
  */
+export function redrawPersistedLines() {
+    if (!overlayCanvas || !overlayCtx) return;
+    if (persistedLines.length === 0) return;
+    overlayCanvas.style.display = 'block';
+    drawAllPersistedLines();
+}
+
 function drawAllPersistedLines() {
     if (!overlayCtx) return;
     overlayCtx.clearRect(0, 0, overlayCanvas.width, overlayCanvas.height);
