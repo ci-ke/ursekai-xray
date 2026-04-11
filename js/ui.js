@@ -16,7 +16,7 @@ let musicDataLoaded = false;
 import { initCanvas, drawGrid, markPoint, displayReward, processPendingItemPositions, adjustItemListPositions, clearItemLists, clearDirtyRegions, calculateDirtyRegions, clearGrid, aggregatePoints } from './canvas.js';
 import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback, initializeItemCheckboxes } from './filters.js';
 import { handleFileUpload, processJsonFile } from './dataParser.js';
-import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas, clearPersistedLines, redrawPersistedLines } from './dragInteraction.js';
+import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas, clearPersistedLines } from './dragInteraction.js';
 
 /**
  * Log messages to UI
@@ -1048,24 +1048,8 @@ export function setDisplayMode(mode) {
 }
 
 window.addEventListener('resize', () => {
-    // On mobile, the browser address bar collapsing/expanding only changes the
-    // viewport height, not the width. Triggering a full re-render in that case
-    // resets manually-moved cards. Only do a full refresh when the width changes;
-    // for height-only changes just update canvas dimensions without rebuilding cards.
-    const newWidth = window.innerWidth;
-    if (newWidth !== domLayoutState.lastWindowWidth) {
-        domLayoutState.lastWindowWidth = newWidth;
-        // Delay increased to 400ms to avoid conflicts with sidebar CSS animations (0.3s)
-        scheduleViewportRefresh(400);
-    } else {
-        // Height-only change (address bar, soft keyboard): resize canvases silently
-        clearTimeout(resizeTimeout);
-        resizeTimeout = setTimeout(() => {
-            initCanvas();
-            refreshOverlayCanvas();
-            redrawPersistedLines();
-        }, 400);
-    }
+    // Delay increased to 400ms to avoid conflicts with sidebar CSS animations (0.3s)
+    scheduleViewportRefresh(400);
 });
 
 // Orientation changes on mobile can report as resize; handle explicitly for clarity
