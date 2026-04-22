@@ -38,6 +38,19 @@ export const SCENES = {
     }
 };
 
+// Scene ID mapping for display names
+export const SITE_ID_MAP = {
+    1: "マイホーム",
+    2: "1F",
+    3: "2F",
+    4: "3F",
+    5: "さいしょの原っぱ",
+    6: "願いの砂浜",
+    7: "彩りの花畑",
+    8: "忘れ去られた場所"
+};
+
+
 // Fixture color mapping for different fixture types
 export const FIXTURE_COLORS = {
     112: '#f9f9f9',
@@ -117,6 +130,9 @@ export const ITEM_TEXTURES = {
         "22": "./icon/Texture2D/item_plant_3.png",
         "23": "./icon/Texture2D/item_plant_4.png",
         "24": "./icon/Texture2D/item_tone_8.png",
+        "32": "./icon/Texture2D/item_junk_8.png",
+        "33": "./icon/Texture2D/item_mineral_8.png",
+        "34": "./icon/Texture2D/item_junk_9.png",
         "35": "./icon/Texture2D/memoria/item_memoria_1.png",
         "36": "./icon/Texture2D/memoria/item_memoria_2.png",
         "37": "./icon/Texture2D/memoria/item_memoria_3.png",
@@ -143,16 +159,31 @@ export const ITEM_TEXTURES = {
         "58": "./icon/Texture2D/memoria/item_memoria_24.png",
         "59": "./icon/Texture2D/memoria/item_memoria_25.png",
         "60": "./icon/Texture2D/memoria/item_memoria_26.png",
-        "32": "./icon/Texture2D/item_junk_8.png",
-        "33": "./icon/Texture2D/item_mineral_8.png",
-        "34": "./icon/Texture2D/item_junk_9.png",
         "61": "./icon/Texture2D/item_junk_10.png",
         "62": "./icon/Texture2D/item_junk_11.png",
         "63": "./icon/Texture2D/item_junk_12.png",
         "64": "./icon/Texture2D/item_mineral_9.png",
         "65": "./icon/Texture2D/item_mineral_10.png",
         "66": "./icon/Texture2D/item_junk_13.png",
-        "93": "./icon/Texture2D/item_junk_14.png"
+        "69": "./icon/Texture2D/item_birthday_flower_3.png",
+        "70": "./icon/Texture2D/item_birthday_flower_4.png",
+        "71": "./icon/Texture2D/item_birthday_flower_5.png",
+        "72": "./icon/Texture2D/item_birthday_flower_6.png",
+        "73": "./icon/Texture2D/item_birthday_flower_7.png",
+        "74": "./icon/Texture2D/item_birthday_flower_8.png",
+        "75": "./icon/Texture2D/item_birthday_flower_9.png",
+        "77": "./icon/Texture2D/item_birthday_flower_11.png",
+        "83": "./icon/Texture2D/item_birthday_flower_17.png",
+        "84": "./icon/Texture2D/item_birthday_flower_18.png",
+        "85": "./icon/Texture2D/item_birthday_flower_19.png",
+        "88": "./icon/Texture2D/item_birthday_flower_22.png",
+        "89": "./icon/Texture2D/item_birthday_flower_23.png",
+        "90": "./icon/Texture2D/item_birthday_flower_24.png",
+        "91": "./icon/Texture2D/item_birthday_flower_25.png",
+        "92": "./icon/Texture2D/item_birthday_flower_26.png",
+        "93": "./icon/Texture2D/item_junk_14.png",
+        "94": "./icon/Texture2D/item_junk_15.png",
+        "95": "./icon/Texture2D/item_junk_16.png",
     },
     mysekai_item: {
         "7": "./icon/Texture2D/item_blueprint_fragment.png"
@@ -176,7 +207,7 @@ export const ITEM_TEXTURES = {
         "480": "./icon/Texture2D/mdl_non1001_before_sprout1_480.png",
         "481": "./icon/Texture2D/mdl_non1001_before_sprout1_481.png",
         "482": "./icon/Texture2D/mdl_non1001_before_sprout1_482.png",
-        "483": "./icon/Texture2D/mdl_non1001_before_sprout1_483.png"
+        "483": "./icon/Texture2D/mdl_non1001_before_sprout1_483.png",
     },
     mysekai_music_record: {
         "*": "./icon/Texture2D/item_surplus_music_record.png"
@@ -185,7 +216,7 @@ export const ITEM_TEXTURES = {
 
 // Rare item rarity tier definitions
 export const RARE_ITEM = {
-    mysekai_material: [5, 12, 20, 24, 32, 33, 61, 62, 63, 64, 65, 66, 93],
+    mysekai_material: [5, 11, 32, 33, 34, 61, 62, 63, 64, 65, 66, 93, 94, 95],
     mysekai_item: [7],
     mysekai_music_record: [],
     mysekai_fixture: [118, 119, 120, 121]
@@ -197,16 +228,4 @@ export const SUPER_RARE_ITEM = {
     mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: []
-};
-
-// Scene ID mapping for display names
-export const SITE_ID_MAP = {
-    1: "マイホーム",
-    2: "1F",
-    3: "2F",
-    4: "3F",
-    5: "さいしょの原っぱ",
-    6: "願いの砂浜",
-    7: "彩りの花畑",
-    8: "忘れ去られた場所"
 };
