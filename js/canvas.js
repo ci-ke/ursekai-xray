@@ -370,7 +370,8 @@ export function markPoint(point, fragment) {
     const isAggregated = point.isAggregated || false;
     const aggregatedCount = point.aggregatedCount || 1;
 
-    const ifContainRareItem = doContainsRareItem(point.reward);
+    // Check if contains rare or super rare items
+    const ifContainRareItem = doContainsRareItem(point.reward) || doContainsRareItem(point.reward, true);
 
     // Only draw point marker if not hidden during drag
     if (color && !shouldHidePointMarker) {
