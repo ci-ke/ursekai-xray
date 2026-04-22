@@ -24,7 +24,9 @@ export function shouldShowItem(category, itemId) {
         return true;
     } else if (filterState.filterMode === 'rare') {
         const rareItems = RARE_ITEM[category] || [];
-        return rareItems.includes(parseInt(itemId));
+        const superRareItems = SUPER_RARE_ITEM[category] || [];
+        const itemIdNum = parseInt(itemId);
+        return rareItems.includes(itemIdNum) || superRareItems.includes(itemIdNum);
     } else if (filterState.filterMode === 'custom') {
         // Wildcard key "*" means the whole category is toggled as one unit
         if (filterState.selectedItems.has(`${category}:*`)) return true;
