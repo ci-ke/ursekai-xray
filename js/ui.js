@@ -3,7 +3,7 @@
  * Handles all UI interactions and rendering orchestration
  */
 
-import { SCENES, FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, SITE_ID_MAP } from './config.js';
+import { SCENES, FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, ULTRA_RARE_ITEM, SITE_ID_MAP } from './config.js';
 import { canvasState, sceneState, domElements, canvasOptimizationState, filterState, texturePreloadState, displayModeState, domLayoutState, dragState } from './state.js';
 
 const MOBILE_PREVIEW_HIDE_MS = 2200;
@@ -258,18 +258,38 @@ export function updateSceneButtonStatus() {
 
         if (!button) continue;
 
-        // Remove previous super-rare styling
-        button.classList.remove('super-rare');
+        // Remove previous rare styling
+        button.classList.remove('super-rare', 'ultra-rare');
 
         if (points && Array.isArray(points)) {
-            // Check if scene has super rare items
-            const hasSuperRare = points.some(point => {
-                return doContainsRareItem(point.reward, true);
+            // Check if scene has ultra rare items
+            const hasUltraRare = points.some(point => {
+                if (!point.reward) return false;
+                for (const category in ULTRA_RARE_ITEM) {
+                    if (point.reward[category]) {
+                        for (const itemId of ULTRA_RARE_ITEM[category]) {
+                            if (point.reward[category].hasOwnProperty(String(itemId))) {
+                                return true;
+                            }
+                        }
+                    }
+                }
+                return false;
             });
 
-            if (hasSuperRare) {
-                button.classList.add('super-rare');
-                logger(`Scene ${sceneName} has super rare items!`);
+            if (hasUltraRare) {
+                button.classList.add('ultra-rare');
+                logger(`Scene ${sceneName} has ultra rare items!`);
+            } else {
+                // Check if scene has super rare items
+                const hasSuperRare = points.some(point => {
+                    return doContainsRareItem(point.reward, true);
+                });
+
+                if (hasSuperRare) {
+                    button.classList.add('super-rare');
+                    logger(`Scene ${sceneName} has super rare items!`);
+                }
             }
         }
     }
@@ -1087,9 +1107,9 @@ export function clearLoadedData() {
         summaryContainer.innerHTML = '<div class="item-summary-empty">No data loaded</div>';
     }
 
-    // Update scene buttons (remove super-rare indicators)
+    // Update scene buttons (remove rare indicators)
     document.querySelectorAll('.scene-buttons button').forEach(btn => {
-        btn.classList.remove('super-rare');
+        btn.classList.remove('super-rare', 'ultra-rare');
     });
 
     logger('Data cleared. Please load a new data file.');

@@ -50,7 +50,6 @@ export const SITE_ID_MAP = {
     8: "忘れ去られた場所"
 };
 
-
 // Fixture color mapping for different fixture types
 export const FIXTURE_COLORS = {
     112: '#f9f9f9',
@@ -225,6 +224,14 @@ export const RARE_ITEM = {
 // Super rare item definitions (highest rarity tier)
 export const SUPER_RARE_ITEM = {
     mysekai_material: [5, 12, 20, 24],
+    mysekai_item: [],
+    mysekai_fixture: [],
+    mysekai_music_record: []
+};
+
+// Ultra rare item definitions (exceptional rarity tier, overrides super rare styling)
+export const ULTRA_RARE_ITEM = {
+    mysekai_material: [12],
     mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: []

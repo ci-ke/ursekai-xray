@@ -122,10 +122,10 @@ def generate_fixture_rare_items(fixtures):
 def format_js_object(data, indent=2):
     """格式化为 JavaScript 对象字符串"""
     lines = []
-    indent_str = ' ' * indent
+    indent_str = ' ' * 4  # 每级缩进 4 个空格
 
     for key, value in data.items():
-        lines.append(f'{indent_str * 2}"{key}": "{value}",')
+        lines.append(f'{indent_str * indent}"{key}": "{value}",')
 
     return '\n'.join(lines)
 
@@ -148,7 +148,111 @@ def update_config(materials, fixtures):
     fixture_rare_items = generate_fixture_rare_items(fixtures)
 
     # 构建新的配置内容
-    config_content = f"""// Item texture mapping - maps item IDs to their texture asset paths
+    config_content = f"""// Scene configuration - per-scene coordinate transformation parameters
+export const SCENES = {{
+    scene1: {{
+        physicalWidth: 33.333,
+        offsetX: 0,
+        offsetY: -40,
+        imagePath: "img/grassland.png",
+        xDirection: 'x-',
+        yDirection: 'y-',
+        reverseXY: true,
+    }},
+    scene2: {{
+        physicalWidth: 24.806,
+        offsetX: -62.015,
+        offsetY: 20.672,
+        imagePath: "img/flowergarden.png",
+        xDirection: 'x-',
+        yDirection: 'y-',
+        reverseXY: true,
+    }},
+    scene3: {{
+        physicalWidth: 20.513,
+        offsetX: 0,
+        offsetY: 80,
+        imagePath: "img/beach.png",
+        xDirection: 'x+',
+        yDirection: 'y-',
+        reverseXY: false,
+    }},
+    scene4: {{
+        physicalWidth: 21.333,
+        offsetX: 0,
+        offsetY: -106.667,
+        imagePath: "img/memorialplace.png",
+        xDirection: 'x+',
+        yDirection: 'y-',
+        reverseXY: false,
+    }}
+}};
+
+// Scene ID mapping for display names
+export const SITE_ID_MAP = {{
+    1: "マイホーム",
+    2: "1F",
+    3: "2F",
+    4: "3F",
+    5: "さいしょの原っぱ",
+    6: "願いの砂浜",
+    7: "彩りの花畑",
+    8: "忘れ去られた場所"
+}};
+
+// Fixture color mapping for different fixture types
+export const FIXTURE_COLORS = {{
+    112: '#f9f9f9',
+
+    1001: '#8B6F47', // wood
+    1002: '#8B6F47',
+    1003: '#8B6F47',
+    1004: '#8B6F47',
+
+    2001: '#878685', // iron
+    2002: '#d5750a', // copper
+    2003: '#d5d5d5', // stone
+    2004: '#a7c7cb',
+    2005: '#9933cc',
+
+    3001: '#4A90E2',
+
+    4001: '#ffd380', // flower
+    4002: '#ffd380',
+    4003: '#ffd380',
+    4004: '#ffd380',
+    4005: '#ffd380',
+    4006: '#ffd380',
+    4007: '#ffd380',
+    4008: '#ffd380',
+    4009: '#ffd380', // cotton
+    4010: '#ffd380',
+    4011: '#ffd380',
+    4012: '#ffd380',
+    4013: '#ffd380',
+    4014: '#ffd380',
+    4015: '#ffd380',
+    4016: '#ffd380',
+    4017: '#ffd380',
+    4018: '#ffd380',
+    4019: '#ffd380',
+    4020: '#ffd380',
+
+    5001: '#f6f5f2',
+    5002: '#f6f5f2',
+    5003: '#f6f5f2',
+    5004: '#f6f5f2',
+    5101: '#f6f5f2',
+    5102: '#f6f5f2',
+    5103: '#f6f5f2',
+    5104: '#f6f5f2',
+
+    6001: '#6f4e37',
+
+    7001: '#a5d9ff',
+}};
+
+// Item texture mapping - maps item IDs to their texture asset paths
 export const ITEM_TEXTURES = {{
     mysekai_material: {{
 {format_js_object(item_textures)}
@@ -178,7 +282,16 @@ export const SUPER_RARE_ITEM = {{
     mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: []
-}};"""
+}};
+
+// Ultra rare item definitions (exceptional rarity tier, overrides super rare styling)
+export const ULTRA_RARE_ITEM = {{
+    mysekai_material: [12],
+    mysekai_item: [],
+    mysekai_fixture: [],
+    mysekai_music_record: []
+}};
+"""
 
     # 写入文件
     with open(config_path, 'w', encoding='utf-8') as f:
