@@ -584,6 +584,10 @@ function onDataLoaded(result) {
         }
     }
 
+    // Clear canvas and reset optimization state to force full redraw
+    clearGrid();
+    canvasOptimizationState.lastRenderedPoints = [];
+
     // Rebuild custom filter checkboxes based on actual items in data
     initializeItemCheckboxes();
 
@@ -1055,7 +1059,7 @@ export async function initializeUI() {
 
     // Load music data for music record display
     loadMusicData();
-    
+
     // Load blueprint data for blueprint display
     loadBlueprintData();
 
