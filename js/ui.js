@@ -13,6 +13,14 @@ let lastTouchPreviewTime = 0;
 // Music data mapping: resourceId -> { title, externalId }
 let musicRecordMap = {};
 let musicDataLoaded = false;
+
+// Blueprint data mapping: blueprintId -> { name, fixtureId }
+let blueprintMap = {};
+let blueprintDataLoaded = false;
+
+// Fixture data mapping: fixtureId -> { name }
+let fixtureMap = {};
+let fixtureDataLoaded = false;
 import { initCanvas, drawGrid, markPoint, displayReward, processPendingItemPositions, adjustItemListPositions, clearItemLists, clearDirtyRegions, calculateDirtyRegions, clearGrid, aggregatePoints } from './canvas.js';
 import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback, initializeItemCheckboxes } from './filters.js';
 import { handleFileUpload, processJsonFile } from './dataParser.js';
@@ -78,6 +86,50 @@ async function loadMusicData() {
     } catch (error) {
         logger(`Music data not available (will use fallback display)`);
         musicDataLoaded = false;
+    }
+}
+
+/**
+ * Load blueprint data for blueprint display
+ */
+async function loadBlueprintData() {
+    try {
+        const [blueprints, fixtures] = await Promise.all([
+            fetch('data/mysekaiBlueprints.json').then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            }),
+            fetch('data/mysekaiFixtures.json').then(r => {
+                if (!r.ok) throw new Error(`HTTP ${r.status}`);
+                return r.json();
+            })
+        ]);
+
+        // Build fixture id → name mapping
+        fixtures.forEach(f => {
+            fixtureMap[f.id] = {
+                name: f.name || 'Unknown'
+            };
+        });
+
+        // Build blueprintId → { name, fixtureId } mapping
+        blueprints.forEach(b => {
+            if (b.mysekaiCraftType === 'mysekai_fixture') {
+                const fixtureName = fixtureMap[b.craftTargetId]?.name || 'Unknown';
+                blueprintMap[b.id] = {
+                    name: fixtureName,
+                    fixtureId: b.craftTargetId
+                };
+            }
+        });
+
+        blueprintDataLoaded = true;
+        fixtureDataLoaded = true;
+        logger(`Loaded ${Object.keys(blueprintMap).length} blueprints`);
+    } catch (error) {
+        logger(`Blueprint data not available (will use fallback display)`);
+        blueprintDataLoaded = false;
+        fixtureDataLoaded = false;
     }
 }
 
@@ -625,6 +677,9 @@ export function initializeImagePreviewDelegation() {
             if (category === 'mysekai_music_record' && e.target.dataset.musicOwned) {
                 itemName += e.target.dataset.musicOwned === 'owned' ? ' [owned]' : ' [new]';
             }
+            if (category === 'mysekai_blueprint' && e.target.dataset.blueprintOwned) {
+                itemName += e.target.dataset.blueprintOwned === 'owned' ? ' [owned]' : ' [new]';
+            }
             showItemPreview(e.target.src, itemName, e.clientX, e.clientY);
         }
     });
@@ -853,6 +908,19 @@ export function updateItemSummary() {
                         musicTitle: musicData ? `#${itemId}:${musicData.externalId} ${musicData.title}` : null,
                         externalId: musicData?.externalId
                     };
+                } else if (category === "mysekai_blueprint") {
+                    // Special handling for blueprints: always show individually (no aggregation)
+                    const uniqueKey = `${category}_${itemId}_${pointIndex}`;
+                    const blueprintData = blueprintDataLoaded ? blueprintMap[itemId] : null;
+
+                    itemMap[uniqueKey] = {
+                        texture: './icon/Texture2D/item_blank_blueprint.png',
+                        quantity: quantity,
+                        category: category,
+                        itemId: itemId,
+                        blueprintName: blueprintData ? `#${itemId}:${blueprintData.fixtureId} ${blueprintData.name}` : null,
+                        fixtureId: blueprintData?.fixtureId
+                    };
                 } else {
                     // Normal aggregation for other items
                     const key = `${category}_${itemId}`;
@@ -907,11 +975,35 @@ export function updateItemSummary() {
                 : '<span class="music-owned-badge new">new</span>';
             if (item.musicTitle) {
                 // data loaded: "#id: externalId title [owned/new]"
-                const tooltipText = `${item.category} #${item.itemId} - ${item.musicTitle}`;
+                const tooltipText = `${item.category} ${item.musicTitle}`;
                 html += `
                     <div class="item-summary-item music-record${rareClass}" title="${tooltipText}">
                         <img src="${item.texture}" alt="${item.musicTitle}">
                         <span class="item-summary-music-title"><span class="music-title-text">${item.musicTitle}</span>${ownedLabel}</span>
+                    </div>
+                `;
+            } else {
+                // data not loaded: "#id [owned/new]"
+                html += `
+                    <div class="item-summary-item music-record${rareClass}" title="${item.category} #${item.itemId}">
+                        <img src="${item.texture}" alt="${item.category} #${item.itemId}">
+                        <span class="item-summary-music-title"><span class="music-title-text">#${item.itemId}</span>${ownedLabel}</span>
+                    </div>
+                `;
+            }
+        } else if (item.category === "mysekai_blueprint") {
+            // Special rendering for blueprints
+            const isOwned = sceneState.ownedBlueprintIds.has(String(item.itemId));
+            const ownedLabel = isOwned
+                ? '<span class="music-owned-badge owned">owned</span>'
+                : '<span class="music-owned-badge new">new</span>';
+            if (item.blueprintName) {
+                // data loaded: "#id name [owned/new]"
+                const tooltipText = `${item.category} ${item.blueprintName}`;
+                html += `
+                    <div class="item-summary-item music-record${rareClass}" title="${tooltipText}">
+                        <img src="${item.texture}" alt="${item.blueprintName}">
+                        <span class="item-summary-music-title"><span class="music-title-text">${item.blueprintName}</span>${ownedLabel}</span>
                     </div>
                 `;
             } else {
@@ -963,6 +1055,9 @@ export async function initializeUI() {
 
     // Load music data for music record display
     loadMusicData();
+    
+    // Load blueprint data for blueprint display
+    loadBlueprintData();
 
     logger('Page loaded. Please load a data file to continue.');
     initializeSidebar();

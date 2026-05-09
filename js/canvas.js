@@ -505,6 +505,8 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
 
             if (category == "mysekai_music_record") {
                 itemImage.src = './icon/Texture2D/item_surplus_music_record.png';
+            } else if (category == "mysekai_blueprint") {
+                itemImage.src = './icon/Texture2D/item_blank_blueprint.png';
             } else {
                 itemImage.src = texture;
             }
@@ -516,6 +518,9 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
             itemImage.dataset.quantity = quantity;
             if (category === 'mysekai_music_record') {
                 itemImage.dataset.musicOwned = sceneState.ownedMusicRecordIds.has(String(itemId)) ? 'owned' : 'new';
+            }
+            if (category === 'mysekai_blueprint') {
+                itemImage.dataset.blueprintOwned = sceneState.ownedBlueprintIds.has(String(itemId)) ? 'owned' : 'new';
             }
 
             // Scale image size using CSS variable base to stay in sync with device profile
@@ -550,7 +555,7 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
         return;
     }
 
-    if (ifContainRareItem || reward.hasOwnProperty("mysekai_music_record")) {
+    if (ifContainRareItem || reward.hasOwnProperty("mysekai_music_record") || reward.hasOwnProperty("mysekai_blueprint")) {
         if (doContainsRareItem(reward, true)) {
             itemList.style.background = 'rgba(197, 100, 119, 0.95)';
         } else {

@@ -202,6 +202,7 @@ export const SITE_ID_MAP = {{
 
 // Fixture color mapping for different fixture types
 export const FIXTURE_COLORS = {{
+    111: '#f9f9f9',
     112: '#f9f9f9',
 
     1001: '#8B6F47', // wood
@@ -265,6 +266,9 @@ export const ITEM_TEXTURES = {{
     }},
     mysekai_music_record: {{
         "*": "./icon/Texture2D/item_surplus_music_record.png"
+    }},
+    mysekai_blueprint: {{
+        "*": "./icon/Texture2D/item_blank_blueprint.png"
     }}
 }};
 
@@ -273,6 +277,7 @@ export const RARE_ITEM = {{
     mysekai_material: [{format_js_array(rare_items)}],
     mysekai_item: [7],
     mysekai_music_record: [],
+    mysekai_blueprint: [],
     mysekai_fixture: [{format_js_array(fixture_rare_items)}]
 }};
 
@@ -281,7 +286,8 @@ export const SUPER_RARE_ITEM = {{
     mysekai_material: [{format_js_array(super_rare_items)}],
     mysekai_item: [],
     mysekai_fixture: [],
-    mysekai_music_record: []
+    mysekai_music_record: [],
+    mysekai_blueprint: []
 }};
 
 // Ultra rare item definitions (exceptional rarity tier, overrides super rare styling)
@@ -289,7 +295,8 @@ export const ULTRA_RARE_ITEM = {{
     mysekai_material: [12],
     mysekai_item: [],
     mysekai_fixture: [],
-    mysekai_music_record: []
+    mysekai_music_record: [],
+    mysekai_blueprint: []
 }};
 """
 

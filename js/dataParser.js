@@ -149,6 +149,13 @@ export function parseMapDataStandard(gameData) {
         logger(`Found ${musicRecords.length} owned music records`);
     }
 
+    // Extract owned blueprint IDs
+    const blueprints = gameData.updatedResources.userMysekaiBlueprints || [];
+    sceneState.ownedBlueprintIds = new Set(blueprints.map(b => String(b.mysekaiBlueprintId)));
+    if (blueprints.length > 0) {
+        logger(`Found ${blueprints.length} owned blueprints`);
+    }
+
     const processedMap = {};
 
     harvestMaps.forEach((mp) => {
