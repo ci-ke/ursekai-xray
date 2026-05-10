@@ -3,7 +3,7 @@
  * Handles all filtering logic for items
  */
 
-import { RARE_ITEM, SUPER_RARE_ITEM, ITEM_TEXTURES } from './config.js';
+import { RARE_ITEM, SUPER_RARE_ITEM, ITEM_TEXTURES, MISSING_ICON } from './config.js';
 import { filterState, sceneState, FILTER_DEBOUNCE_DELAY } from './state.js';
 
 // Callback for redrawing points - set by ui.js during initialization
@@ -85,13 +85,13 @@ export function initializeItemCheckboxes() {
                             seen.set(key, {
                                 category,
                                 itemId: '*',
-                                path: ITEM_TEXTURES[category]?.['*'] || './icon/missing.png'
+                                path: ITEM_TEXTURES[category]?.['*'] || MISSING_ICON
                             });
                         }
                     } else {
                         const key = `${category}:${itemId}`;
                         if (!seen.has(key)) {
-                            const path = ITEM_TEXTURES[category]?.[itemId] || './icon/missing.png';
+                            const path = ITEM_TEXTURES[category]?.[itemId] || ITEM_TEXTURES[category]?.['*'] || MISSING_ICON;
                             seen.set(key, { category, itemId, path });
                         }
                     }
@@ -151,7 +151,7 @@ export function initializeItemCheckboxes() {
         const img = document.createElement('img');
         img.src = item.path;
         img.alt = titleText;
-        img.onerror = function () { this.src = './icon/missing.png'; };
+        img.onerror = function () { this.src = MISSING_ICON; };
 
         label.appendChild(img);
         checkbox.appendChild(input);

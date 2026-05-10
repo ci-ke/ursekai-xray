@@ -3,7 +3,7 @@
  * Handles all canvas drawing and rendering
  */
 
-import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM } from './config.js';
+import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, MISSING_ICON } from './config.js';
 import { domElements, canvasState, domLayoutState, canvasOptimizationState, aggregationState, dragState, displayModeState, sceneState } from './state.js';
 import { shouldShowItem } from './filters.js';
 
@@ -498,18 +498,12 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
             // Do NOT multiply quantity for aggregated cards
             // Count badge provides visual indicator instead
 
-            const texture = ITEM_TEXTURES[category]?.[itemId] || './icon/missing.png';
+            const texture = ITEM_TEXTURES[category]?.[itemId] || ITEM_TEXTURES[category]?.['*'] || MISSING_ICON;
 
             const itemEntry = document.createElement('div');
             const itemImage = document.createElement('img');
 
-            if (category == "mysekai_music_record") {
-                itemImage.src = './icon/Texture2D/item_surplus_music_record.png';
-            } else if (category == "mysekai_blueprint") {
-                itemImage.src = './icon/Texture2D/item_blank_blueprint.png';
-            } else {
-                itemImage.src = texture;
-            }
+            itemImage.src = texture;
 
             itemImage.style.cursor = 'pointer';
             // Store data attributes for event delegation

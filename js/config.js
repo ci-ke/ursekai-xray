@@ -103,6 +103,9 @@ export const FIXTURE_COLORS = {
     7001: '#a5d9ff',
 };
 
+// Default fallback icon for missing textures
+export const MISSING_ICON = './icon/missing.png';
+
 // Item texture mapping - maps item IDs to their texture asset paths
 export const ITEM_TEXTURES = {
     mysekai_material: {
@@ -213,7 +216,7 @@ export const ITEM_TEXTURES = {
         "*": "./icon/Texture2D/item_surplus_music_record.png"
     },
     mysekai_blueprint: {
-        "*": "./icon/Texture2D/item_blank_blueprint.png"
+        "*": "./icon/Texture2D/item_surplus_blueprint.png"
     }
 };
 

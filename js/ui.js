@@ -3,7 +3,7 @@
  * Handles all UI interactions and rendering orchestration
  */
 
-import { SCENES, FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, ULTRA_RARE_ITEM, SITE_ID_MAP } from './config.js';
+import { SCENES, FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, ULTRA_RARE_ITEM, SITE_ID_MAP, MISSING_ICON } from './config.js';
 import { canvasState, sceneState, domElements, canvasOptimizationState, filterState, texturePreloadState, displayModeState, domLayoutState, dragState } from './state.js';
 
 const MOBILE_PREVIEW_HIDE_MS = 2200;
@@ -905,7 +905,7 @@ export function updateItemSummary() {
                     const musicData = musicDataLoaded ? musicRecordMap[itemId] : null;
 
                     itemMap[uniqueKey] = {
-                        texture: './icon/Texture2D/item_surplus_music_record.png',
+                        texture: ITEM_TEXTURES[category]?.['*'] || MISSING_ICON,
                         quantity: quantity,
                         category: category,
                         itemId: itemId,
@@ -918,7 +918,7 @@ export function updateItemSummary() {
                     const blueprintData = blueprintDataLoaded ? blueprintMap[itemId] : null;
 
                     itemMap[uniqueKey] = {
-                        texture: './icon/Texture2D/item_blank_blueprint.png',
+                        texture: ITEM_TEXTURES[category]?.['*'] || MISSING_ICON,
                         quantity: quantity,
                         category: category,
                         itemId: itemId,
@@ -930,7 +930,7 @@ export function updateItemSummary() {
                     const key = `${category}_${itemId}`;
 
                     if (!itemMap[key]) {
-                        const texture = ITEM_TEXTURES[category]?.[itemId] || './icon/missing.png';
+                        const texture = ITEM_TEXTURES[category]?.[itemId] || ITEM_TEXTURES[category]?.['*'] || MISSING_ICON;
                         itemMap[key] = {
                             texture: texture,
                             quantity: 0,

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-更新 new_config.js 中的常量
+更新 config.js
 从 mysekaiMaterials.json 和 mysekaiFixtures.json 读取信息并更新配置文件
 """
 
@@ -253,6 +253,9 @@ export const FIXTURE_COLORS = {{
     7001: '#a5d9ff',
 }};
 
+// Default fallback icon for missing textures
+export const MISSING_ICON = './icon/missing.png';
+
 // Item texture mapping - maps item IDs to their texture asset paths
 export const ITEM_TEXTURES = {{
     mysekai_material: {{
@@ -268,7 +271,7 @@ export const ITEM_TEXTURES = {{
         "*": "./icon/Texture2D/item_surplus_music_record.png"
     }},
     mysekai_blueprint: {{
-        "*": "./icon/Texture2D/item_blank_blueprint.png"
+        "*": "./icon/Texture2D/item_surplus_blueprint.png"
     }}
 }};
 
