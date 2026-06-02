@@ -1077,6 +1077,10 @@ export async function initializeUI() {
     const lastScene = localStorage.getItem('lastScene') || 'scene1';
     selectScene(lastScene);
 
+    // Restore BG overlay preference
+    const savedBg = localStorage.getItem('bgOverlay') || 'off';
+    setBgOverlay(savedBg);
+
     // Try to auto-load mysekai_data.json first (highest priority, not cached)
     try {
         const response = await fetch('mysekai_data.json');
@@ -1256,14 +1260,20 @@ function setBgOverlay(value) {
 
     if (value === 'off') {
         overlay.style.display = 'none';
-        return;
+    } else {
+        const [color, pct] = value.split('-');
+        const alpha = parseInt(pct) / 100;
+        const rgb = color === 'white' ? '255,255,255' : '0,0,0';
+        overlay.style.background = `rgba(${rgb},${alpha})`;
+        overlay.style.display = 'block';
     }
 
-    const [color, pct] = value.split('-');
-    const alpha = parseInt(pct) / 100;
-    const rgb = color === 'white' ? '255,255,255' : '0,0,0';
-    overlay.style.background = `rgba(${rgb},${alpha})`;
-    overlay.style.display = 'block';
+    // Persist BG overlay preference
+    localStorage.setItem('bgOverlay', value);
+
+    // Sync the select element to match
+    const select = document.getElementById('bgOverlaySelect');
+    if (select) select.value = value;
 }
 window.setBgOverlay = setBgOverlay;
 

@@ -3,7 +3,7 @@
  * Handles all canvas drawing and rendering
  */
 
-import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, MISSING_ICON } from './config.js';
+import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, ULTRA_RARE_ITEM, MISSING_ICON } from './config.js';
 import { domElements, canvasState, domLayoutState, canvasOptimizationState, aggregationState, dragState, displayModeState, sceneState } from './state.js';
 import { shouldShowItem } from './filters.js';
 
@@ -457,6 +457,11 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
     itemList.style.cursor = 'grab';
     itemList.style.userSelect = 'none';
 
+    // Set z-index based on highest rarity tier in this card's rewards
+    const rarityZIndex = getRarityZIndex(reward);
+    itemList.style.zIndex = rarityZIndex;
+    itemList.dataset.rarityZIndex = rarityZIndex;
+
     // Prevent drag behavior on this card
     itemList.addEventListener('dragstart', (e) => {
         e.preventDefault();
@@ -597,7 +602,7 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
         itemList.style.zIndex = 9998;
     };
     itemList.onmouseout = () => {
-        itemList.style.zIndex = 1;
+        itemList.style.zIndex = parseInt(itemList.dataset.rarityZIndex) || 1;
     };
 
     // Queue position adjustments for batch processing
@@ -797,4 +802,43 @@ function doContainsRareItem(reward, isSuperRare = false) {
         }
     }
     return false;
+}
+
+/**
+ * Determine the base z-index for a card based on its highest rarity tier.
+ * Higher rarity = higher z-index = rendered on top of lower rarity cards.
+ *
+ * Tier mapping:
+ *   Ultra Rare  → z-index: 4
+ *   Super Rare  → z-index: 3
+ *   Rare        → z-index: 2
+ *   Common      → z-index: 1
+ */
+function getRarityZIndex(reward) {
+    // Check from highest to lowest tier, return immediately on first match
+    for (const category in reward) {
+        if (!reward.hasOwnProperty(category)) continue;
+        for (const itemId of Object.keys(reward[category])) {
+            if (ULTRA_RARE_ITEM[category]?.includes(parseInt(itemId))) {
+                return 4;
+            }
+        }
+    }
+    for (const category in reward) {
+        if (!reward.hasOwnProperty(category)) continue;
+        for (const itemId of Object.keys(reward[category])) {
+            if (SUPER_RARE_ITEM[category]?.includes(parseInt(itemId))) {
+                return 3;
+            }
+        }
+    }
+    for (const category in reward) {
+        if (!reward.hasOwnProperty(category)) continue;
+        for (const itemId of Object.keys(reward[category])) {
+            if (RARE_ITEM[category]?.includes(parseInt(itemId))) {
+                return 2;
+            }
+        }
+    }
+    return 1;
 }

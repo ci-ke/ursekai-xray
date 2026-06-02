@@ -332,7 +332,7 @@ function handleCardPointerUp(e) {
 
     // Keep card at its dragged position (do not restore original position)
     card.style.cursor = 'grab';
-    card.style.zIndex = 1;
+    card.style.zIndex = parseInt(card.dataset.rarityZIndex) || 1;
 
     // Hide any active item preview tooltip
     hideItemPreview();
