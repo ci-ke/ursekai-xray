@@ -5,18 +5,18 @@
 从 mysekaiMaterials.json 和 mysekaiFixtures.json 读取信息并更新配置文件
 """
 
+import io
 import json
 import os
 import sys
+from typing import Any
 
 # 设置标准输出编码为 UTF-8
 if sys.platform == 'win32':
-    import io
-
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
-def load_materials():
+def load_materials() -> list[dict[str, Any]]:
     """加载材料数据"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     materials_path = os.path.join(script_dir, 'mysekaiMaterials.json')
@@ -25,7 +25,7 @@ def load_materials():
         return json.load(f)
 
 
-def load_fixtures():
+def load_fixtures() -> list[dict[str, Any]]:
     """加载家具数据"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     fixtures_path = os.path.join(script_dir, 'mysekaiFixtures.json')
@@ -34,9 +34,9 @@ def load_fixtures():
         return json.load(f)
 
 
-def generate_item_textures(materials):
+def generate_item_textures(materials: list[dict[str, Any]]) -> dict[str, str]:
     """生成 ITEM_TEXTURES 映射 (包含所有材料)"""
-    textures = {}
+    textures: dict[str, str] = {}
 
     for material in materials:
         item_id = str(material['id'])
@@ -53,9 +53,9 @@ def generate_item_textures(materials):
     return textures
 
 
-def generate_fixture_textures(fixtures):
+def generate_fixture_textures(fixtures: list[dict[str, Any]]) -> dict[str, str]:
     """生成 mysekai_fixture 的纹理映射 (只包含 plant 类型)"""
-    textures = {}
+    textures: dict[str, str] = {}
 
     for fixture in fixtures:
         # 只处理 plant 类型的家具
@@ -72,13 +72,13 @@ def generate_fixture_textures(fixtures):
     return textures
 
 
-def generate_rare_items(materials):
+def generate_rare_items(materials: list[dict[str, Any]]) -> list[int]:
     """生成 RARE_ITEM 列表 (rarity_2)"""
-    rare_items = []
+    rare_items: list[int] = []
 
     for material in materials:
         # 排除 game_character 和 birthday_party 类型
-        if material['mysekaiMaterialType'] in ['game_character', 'birthday_party']:
+        if material['mysekaiMaterialType'] in ('game_character', 'birthday_party'):
             continue
 
         if material['mysekaiMaterialRarityType'] == 'rarity_2':
@@ -87,41 +87,25 @@ def generate_rare_items(materials):
     return sorted(rare_items)
 
 
-def generate_super_rare_items(materials):
+def generate_super_rare_items(materials: list[dict[str, Any]]) -> list[int]:
     """生成 SUPER_RARE_ITEM 列表 (rarity_3 和 rarity_4,并固定包含 5, 12, 20, 24)"""
-    super_rare_items = set([5, 12, 20, 24])  # 固定包含这些ID
+    super_rare_items: set[int] = {5, 12, 20, 24}  # 固定包含这些ID
 
     for material in materials:
         # 排除 game_character 和 birthday_party 类型
-        if material['mysekaiMaterialType'] in ['game_character', 'birthday_party']:
+        if material['mysekaiMaterialType'] in ('game_character', 'birthday_party'):
             continue
 
         rarity = material['mysekaiMaterialRarityType']
-        if rarity in ['rarity_3', 'rarity_4']:
+        if rarity in ('rarity_3', 'rarity_4'):
             super_rare_items.add(material['id'])
 
-    return sorted(list(super_rare_items))
+    return sorted(super_rare_items)
 
 
-def generate_fixture_rare_items(fixtures):
-    """生成 mysekai_fixture 的稀有物品列表 (plant 类型中 seq 在 21001001-21001004 范围内的)"""
-    rare_items = []
-
-    for fixture in fixtures:
-        # 只处理 plant 类型的家具
-        if fixture['mysekaiFixtureType'] != 'plant':
-            continue
-
-        # seq 在 21001001-21001004 范围内的是稀有物品(树苗)
-        if 21001001 <= fixture['seq'] <= 21001004:
-            rare_items.append(fixture['id'])
-
-    return sorted(rare_items)
-
-
-def format_js_object(data, indent=2):
+def format_js_object(data: dict[str, str], indent: int = 2) -> str:
     """格式化为 JavaScript 对象字符串"""
-    lines = []
+    lines: list[str] = []
     indent_str = ' ' * 4  # 每级缩进 4 个空格
 
     for key, value in data.items():
@@ -130,12 +114,12 @@ def format_js_object(data, indent=2):
     return '\n'.join(lines)
 
 
-def format_js_array(data, indent=2):
+def format_js_array(data: list[int]) -> str:
     """格式化为 JavaScript 数组字符串"""
     return ', '.join(str(x) for x in data)
 
 
-def update_config(materials, fixtures):
+def update_config(materials: list[dict[str, Any]], fixtures: list[dict[str, Any]]) -> None:
     """更新 new_config.js 文件"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(script_dir, 'new_config.js')
@@ -145,7 +129,6 @@ def update_config(materials, fixtures):
     fixture_textures = generate_fixture_textures(fixtures)
     rare_items = generate_rare_items(materials)
     super_rare_items = generate_super_rare_items(materials)
-    fixture_rare_items = generate_fixture_rare_items(fixtures)
 
     # 构建新的配置内容
     config_content = f"""// Scene configuration - per-scene coordinate transformation parameters
@@ -215,6 +198,7 @@ export const FIXTURE_COLORS = {{
     2003: '#d5d5d5', // stone
     2004: '#a7c7cb',
     2005: '#9933cc',
+    2006: '#00FFFF', // diamond
 
     3001: '#4A90E2',
 
@@ -279,9 +263,9 @@ export const ITEM_TEXTURES = {{
 export const RARE_ITEM = {{
     mysekai_material: [{format_js_array(rare_items)}],
     mysekai_item: [7],
+    mysekai_fixture: [],
     mysekai_music_record: [],
-    mysekai_blueprint: [],
-    mysekai_fixture: [{format_js_array(fixture_rare_items)}]
+    mysekai_blueprint: []
 }};
 
 // Super rare item definitions (highest rarity tier)
@@ -304,18 +288,17 @@ export const ULTRA_RARE_ITEM = {{
 """
 
     # 写入文件
-    with open(config_path, 'w', encoding='utf-8') as f:
+    with open(config_path, 'w', encoding='utf-8', newline='\n') as f:
         f.write(config_content)
 
-    print(f"[OK] 已更新 new_config.js")
+    print("[OK] 已更新 new_config.js")
     print(f"  - 材料纹理映射: {len(item_textures)} 项")
     print(f"  - 家具纹理映射: {len(fixture_textures)} 项")
     print(f"  - 稀有材料: {len(rare_items)} 项")
     print(f"  - 超稀有材料: {len(super_rare_items)} 项")
-    print(f"  - 稀有家具: {len(fixture_rare_items)} 项")
 
 
-def main():
+def main() -> None:
     """主函数"""
     print("开始更新配置文件...")
 

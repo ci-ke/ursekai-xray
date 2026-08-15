@@ -65,6 +65,7 @@ export const FIXTURE_COLORS = {
     2003: '#d5d5d5', // stone
     2004: '#a7c7cb',
     2005: '#9933cc',
+    2006: '#00FFFF', // diamond
 
     3001: '#4A90E2',
 
@@ -168,6 +169,8 @@ export const ITEM_TEXTURES = {
         "64": "./icon/Texture2D/item_mineral_9.png",
         "65": "./icon/Texture2D/item_mineral_10.png",
         "66": "./icon/Texture2D/item_junk_13.png",
+        "67": "./icon/Texture2D/item_birthday_flower_1.png",
+        "68": "./icon/Texture2D/item_birthday_flower_2.png",
         "69": "./icon/Texture2D/item_birthday_flower_3.png",
         "70": "./icon/Texture2D/item_birthday_flower_4.png",
         "71": "./icon/Texture2D/item_birthday_flower_5.png",
@@ -175,7 +178,12 @@ export const ITEM_TEXTURES = {
         "73": "./icon/Texture2D/item_birthday_flower_7.png",
         "74": "./icon/Texture2D/item_birthday_flower_8.png",
         "75": "./icon/Texture2D/item_birthday_flower_9.png",
+        "76": "./icon/Texture2D/item_birthday_flower_10.png",
         "77": "./icon/Texture2D/item_birthday_flower_11.png",
+        "78": "./icon/Texture2D/item_birthday_flower_12.png",
+        "79": "./icon/Texture2D/item_birthday_flower_13.png",
+        "81": "./icon/Texture2D/item_birthday_flower_15.png",
+        "82": "./icon/Texture2D/item_birthday_flower_16.png",
         "83": "./icon/Texture2D/item_birthday_flower_17.png",
         "84": "./icon/Texture2D/item_birthday_flower_18.png",
         "85": "./icon/Texture2D/item_birthday_flower_19.png",
@@ -187,6 +195,7 @@ export const ITEM_TEXTURES = {
         "93": "./icon/Texture2D/item_junk_14.png",
         "94": "./icon/Texture2D/item_junk_15.png",
         "95": "./icon/Texture2D/item_junk_16.png",
+        "96": "./icon/Texture2D/item_junk_17.png",
     },
     mysekai_item: {
         "7": "./icon/Texture2D/item_blueprint_fragment.png"
@@ -222,11 +231,11 @@ export const ITEM_TEXTURES = {
 
 // Rare item rarity tier definitions
 export const RARE_ITEM = {
-    mysekai_material: [5, 11, 32, 33, 34, 61, 62, 63, 64, 65, 66, 93, 94, 95],
+    mysekai_material: [5, 11, 32, 33, 34, 61, 62, 63, 64, 65, 66, 93, 94, 95, 96],
     mysekai_item: [7],
+    mysekai_fixture: [],
     mysekai_music_record: [],
-    mysekai_blueprint: [],
-    mysekai_fixture: [118, 119, 120, 121]
+    mysekai_blueprint: []
 };
 
 // Super rare item definitions (highest rarity tier)
