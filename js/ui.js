@@ -1057,21 +1057,6 @@ export async function initializeUI() {
         parseAndMarkPoints();
     });
 
-    // Restore "Show Full Cards" preference and sync the checkbox UI
-    const savedShowFullCards = (() => {
-        try {
-            return localStorage.getItem('ursekai-xray-show-full-cards') === '1';
-        } catch (e) {
-            return false;
-        }
-    })();
-    filterState.showFullCards = savedShowFullCards;
-    const fullCardsCheckbox = document.getElementById('filterFullCards');
-    if (fullCardsCheckbox) {
-        fullCardsCheckbox.checked = savedShowFullCards;
-        fullCardsCheckbox.disabled = filterState.filterMode === 'all';
-    }
-
     // Load music data for music record display
     loadMusicData();
 

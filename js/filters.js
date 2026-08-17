@@ -67,14 +67,10 @@ export function changeFilterMode() {
 /**
  * Toggle showing full cards: when enabled, any card that matches the current
  * filter displays ALL of its items instead of only the filtered ones.
+ * Like other filter settings, this is session-only state (not persisted).
  */
 export function setShowFullCards(enabled) {
     filterState.showFullCards = !!enabled;
-    try {
-        localStorage.setItem('ursekai-xray-show-full-cards', filterState.showFullCards ? '1' : '0');
-    } catch (e) {
-        // localStorage unavailable (e.g. file:// with strict settings) - ignore
-    }
     clearTimeout(filterState.filterDebounceTimer);
     filterState.filterDebounceTimer = setTimeout(() => {
         if (onFilterChange) {
