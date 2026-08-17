@@ -49,7 +49,32 @@ export function changeFilterMode() {
         customCheckboxes.style.display = 'none';
     }
 
+    // "Show Full Cards" only makes sense when filtering is active (rare/custom)
+    const fullCardsCheckbox = document.getElementById('filterFullCards');
+    if (fullCardsCheckbox) {
+        fullCardsCheckbox.disabled = filterState.filterMode === 'all';
+    }
+
     // Debounce filter changes to avoid multiple redraws during rapid filter toggles
+    clearTimeout(filterState.filterDebounceTimer);
+    filterState.filterDebounceTimer = setTimeout(() => {
+        if (onFilterChange) {
+            onFilterChange();
+        }
+    }, FILTER_DEBOUNCE_DELAY);
+}
+
+/**
+ * Toggle showing full cards: when enabled, any card that matches the current
+ * filter displays ALL of its items instead of only the filtered ones.
+ */
+export function setShowFullCards(enabled) {
+    filterState.showFullCards = !!enabled;
+    try {
+        localStorage.setItem('ursekai-xray-show-full-cards', filterState.showFullCards ? '1' : '0');
+    } catch (e) {
+        // localStorage unavailable (e.g. file:// with strict settings) - ignore
+    }
     clearTimeout(filterState.filterDebounceTimer);
     filterState.filterDebounceTimer = setTimeout(() => {
         if (onFilterChange) {

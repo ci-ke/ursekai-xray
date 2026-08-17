@@ -22,7 +22,7 @@ let blueprintDataLoaded = false;
 let fixtureMap = {};
 let fixtureDataLoaded = false;
 import { initCanvas, drawGrid, markPoint, displayReward, processPendingItemPositions, adjustItemListPositions, clearItemLists, clearDirtyRegions, calculateDirtyRegions, clearGrid, aggregatePoints } from './canvas.js';
-import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback, initializeItemCheckboxes } from './filters.js';
+import { changeFilterMode, toggleFilterPanel, doContainsRareItem, shouldShowItem, setFilterChangeCallback, initializeItemCheckboxes, setShowFullCards } from './filters.js';
 import { handleFileUpload, processJsonFile } from './dataParser.js';
 import { initializeDragInteraction, setCurrentScene, refreshOverlayCanvas, clearPersistedLines } from './dragInteraction.js';
 
@@ -1057,6 +1057,21 @@ export async function initializeUI() {
         parseAndMarkPoints();
     });
 
+    // Restore "Show Full Cards" preference and sync the checkbox UI
+    const savedShowFullCards = (() => {
+        try {
+            return localStorage.getItem('ursekai-xray-show-full-cards') === '1';
+        } catch (e) {
+            return false;
+        }
+    })();
+    filterState.showFullCards = savedShowFullCards;
+    const fullCardsCheckbox = document.getElementById('filterFullCards');
+    if (fullCardsCheckbox) {
+        fullCardsCheckbox.checked = savedShowFullCards;
+        fullCardsCheckbox.disabled = filterState.filterMode === 'all';
+    }
+
     // Load music data for music record display
     loadMusicData();
 
@@ -1229,6 +1244,7 @@ window.drawGrid = drawGrid;
 window.clearGrid = () => { clearPersistedLines(); clearGrid(); };
 window.toggleFilterPanel = toggleFilterPanel;
 window.changeFilterMode = changeFilterMode;
+window.setShowFullCards = setShowFullCards;
 window.toggleSidebar = toggleSidebar;
 window.closeSidebar = closeSidebar;
 window.openDropZoneModal = openDropZoneModal;

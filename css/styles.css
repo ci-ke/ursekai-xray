@@ -530,6 +530,17 @@ summary:hover {
     gap: 8px;
 }
 
+.filter-option .filter-hint {
+    font-size: 11px;
+    color: #888;
+    font-weight: normal;
+}
+
+.filter-option input[type="checkbox"]:disabled + label {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
 .item-checkbox-list {
     display: grid;
     grid-template-columns: 1fr 1fr;

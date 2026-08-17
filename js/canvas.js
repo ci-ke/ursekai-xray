@@ -4,7 +4,7 @@
  */
 
 import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, ULTRA_RARE_ITEM, MISSING_ICON } from './config.js';
-import { domElements, canvasState, domLayoutState, canvasOptimizationState, aggregationState, dragState, displayModeState, sceneState } from './state.js';
+import { domElements, canvasState, domLayoutState, canvasOptimizationState, aggregationState, dragState, displayModeState, sceneState, filterState } from './state.js';
 import { shouldShowItem } from './filters.js';
 
 /**
@@ -486,7 +486,28 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
         console.log('TEST displayReward: scaleFactor enabled, aggregated=' + isAggregated + ', count=' + aggregatedCount + ', scaleFactor=' + scaleFactor.toFixed(2));
     }
 
+    // Determine if this card should be visible: it must contain at least one item matching the current filter
     let hasVisibleItems = false;
+    for (const category in reward) {
+        if (!reward.hasOwnProperty(category)) continue;
+        for (const itemId in reward[category]) {
+            if (!reward[category].hasOwnProperty(itemId)) continue;
+            if (shouldShowItem(category, itemId)) {
+                hasVisibleItems = true;
+                break;
+            }
+        }
+        if (hasVisibleItems) break;
+    }
+
+    // If no visible items, don't show item card
+    if (!hasVisibleItems) {
+        return;
+    }
+
+    // When "Show Full Cards" is enabled, display every item on a matched card;
+    // otherwise only render items that pass the current filter
+    const renderAllCardItems = filterState.showFullCards;
 
     for (const category in reward) {
         if (!reward.hasOwnProperty(category)) continue;
@@ -494,11 +515,10 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
             if (!reward[category].hasOwnProperty(itemId)) continue;
 
             // Check if this item should be displayed
-            if (!shouldShowItem(category, itemId)) {
+            if (!renderAllCardItems && !shouldShowItem(category, itemId)) {
                 continue;
             }
 
-            hasVisibleItems = true;
             let quantity = reward[category][itemId];
             // Do NOT multiply quantity for aggregated cards
             // Count badge provides visual indicator instead
@@ -547,11 +567,6 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
 
             itemList.appendChild(itemEntry);
         }
-    }
-
-    // If no visible items, don't show item card
-    if (!hasVisibleItems) {
-        return;
     }
 
     if (ifContainRareItem || reward.hasOwnProperty("mysekai_music_record") || reward.hasOwnProperty("mysekai_blueprint")) {

@@ -25,6 +25,7 @@ export const filterState = {
     filterMode: 'all', // 'all', 'rare', 'custom'
     selectedItems: new Set(),
     filterDebounceTimer: null,
+    showFullCards: false, // When filtering, show ALL items on cards that match the filter
 };
 
 const FILTER_DEBOUNCE_DELAY = 150;
