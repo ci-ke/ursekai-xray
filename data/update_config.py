@@ -262,7 +262,7 @@ export const ITEM_TEXTURES = {{
 // Rare item rarity tier definitions
 export const RARE_ITEM = {{
     mysekai_material: [{format_js_array(rare_items)}],
-    mysekai_item: [7],
+    mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: [],
     mysekai_blueprint: []

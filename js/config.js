@@ -182,11 +182,14 @@ export const ITEM_TEXTURES = {
         "77": "./icon/Texture2D/item_birthday_flower_11.png",
         "78": "./icon/Texture2D/item_birthday_flower_12.png",
         "79": "./icon/Texture2D/item_birthday_flower_13.png",
+        "80": "./icon/Texture2D/item_birthday_flower_14.png",
         "81": "./icon/Texture2D/item_birthday_flower_15.png",
         "82": "./icon/Texture2D/item_birthday_flower_16.png",
         "83": "./icon/Texture2D/item_birthday_flower_17.png",
         "84": "./icon/Texture2D/item_birthday_flower_18.png",
         "85": "./icon/Texture2D/item_birthday_flower_19.png",
+        "86": "./icon/Texture2D/item_birthday_flower_20.png",
+        "87": "./icon/Texture2D/item_birthday_flower_21.png",
         "88": "./icon/Texture2D/item_birthday_flower_22.png",
         "89": "./icon/Texture2D/item_birthday_flower_23.png",
         "90": "./icon/Texture2D/item_birthday_flower_24.png",
@@ -232,7 +235,7 @@ export const ITEM_TEXTURES = {
 // Rare item rarity tier definitions
 export const RARE_ITEM = {
     mysekai_material: [5, 11, 32, 33, 34, 61, 62, 63, 64, 65, 66, 93, 94, 95, 96],
-    mysekai_item: [7],
+    mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: [],
     mysekai_blueprint: []
