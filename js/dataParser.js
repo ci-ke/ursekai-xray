@@ -121,6 +121,54 @@ export function parseMapDataSimplified(gameData) {
 }
 
 /**
+ * The mysekai API switched to positional-array (tuple) encoding for harvest map
+ * entries: [mysekaiSiteId, fixtures, drops], where each fixture is
+ * [mysekaiSiteHarvestFixtureId, positionX, positionZ, rotation, status, ...] and
+ * each drop is [resourceType, resourceId, positionX, positionZ, transportSeconds,
+ * seq, status, quantity, ...]. Older exports used named objects. These helpers
+ * normalize both shapes to the named fields the renderer consumes.
+ */
+function normalizeHarvestMap(mp) {
+    if (Array.isArray(mp)) {
+        return {
+            mysekaiSiteId: mp[0],
+            fixtures: Array.isArray(mp[1]) ? mp[1] : [],
+            drops: Array.isArray(mp[2]) ? mp[2] : []
+        };
+    }
+    return {
+        mysekaiSiteId: mp.mysekaiSiteId,
+        fixtures: mp.userMysekaiSiteHarvestFixtures || [],
+        drops: mp.userMysekaiSiteHarvestResourceDrops || []
+    };
+}
+
+function normalizeHarvestFixture(fixture) {
+    if (Array.isArray(fixture)) {
+        return {
+            mysekaiSiteHarvestFixtureId: fixture[0],
+            positionX: fixture[1],
+            positionZ: fixture[2],
+            userMysekaiSiteHarvestFixtureStatus: fixture[4]
+        };
+    }
+    return fixture;
+}
+
+function normalizeHarvestDrop(drop) {
+    if (Array.isArray(drop)) {
+        return {
+            resourceType: drop[0],
+            resourceId: drop[1],
+            positionX: drop[2],
+            positionZ: drop[3],
+            quantity: drop[7]
+        };
+    }
+    return drop;
+}
+
+/**
  * Parse harvest map data from game API response (standard format)
  */
 export function parseMapDataStandard(gameData) {
@@ -158,17 +206,19 @@ export function parseMapDataStandard(gameData) {
 
     const processedMap = {};
 
-    harvestMaps.forEach((mp) => {
+    harvestMaps.forEach((rawMp) => {
+        const mp = normalizeHarvestMap(rawMp);
         const siteId = mp.mysekaiSiteId;
         const siteName = SITE_ID_MAP[siteId] || `Unknown Site ${siteId}`;
 
         const mpDetail = [];
-        const fixtures = mp.userMysekaiSiteHarvestFixtures || [];
-        const drops = mp.userMysekaiSiteHarvestResourceDrops || [];
+        const fixtures = mp.fixtures;
+        const drops = mp.drops;
 
         // Collect all spawned fixtures
         let spawnedCount = 0;
-        fixtures.forEach(fixture => {
+        fixtures.forEach(rawFixture => {
+            const fixture = normalizeHarvestFixture(rawFixture);
             if (fixture.userMysekaiSiteHarvestFixtureStatus === "spawned") {
                 mpDetail.push({
                     location: [fixture.positionX, fixture.positionZ],
@@ -180,7 +230,8 @@ export function parseMapDataStandard(gameData) {
         });
 
         // Add drop items to fixtures
-        drops.forEach(drop => {
+        drops.forEach(rawDrop => {
+            const drop = normalizeHarvestDrop(rawDrop);
             const pos = [drop.positionX, drop.positionZ];
             const found = mpDetail.find(item =>
                 item.location[0] === pos[0] && item.location[1] === pos[1]
