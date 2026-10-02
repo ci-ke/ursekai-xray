@@ -3,7 +3,7 @@
  * Handles all canvas drawing and rendering
  */
 
-import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, ULTRA_RARE_ITEM, MISSING_ICON } from './config.js';
+import { FIXTURE_COLORS, ITEM_TEXTURES, RARE_ITEM, SUPER_RARE_ITEM, ULTRA_RARE_ITEM, MISSING_ICON, DEFAULT_FIXTURE_COLOR } from './config.js';
 import { domElements, canvasState, domLayoutState, canvasOptimizationState, aggregationState, dragState, displayModeState, sceneState, filterState } from './state.js';
 import { shouldShowItem } from './filters.js';
 
@@ -366,7 +366,7 @@ export function markPoint(point, fragment) {
         if (hasVisibleItems) break;
     }
 
-    const color = FIXTURE_COLORS[point.fixtureId];
+    const color = FIXTURE_COLORS[point.fixtureId] || DEFAULT_FIXTURE_COLOR;
     const isAggregated = point.isAggregated || false;
     const aggregatedCount = point.aggregatedCount || 1;
 

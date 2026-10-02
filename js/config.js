@@ -107,6 +107,9 @@ export const FIXTURE_COLORS = {
 // Default fallback icon for missing textures
 export const MISSING_ICON = './icon/missing.png';
 
+// Default color for fixtures without a FIXTURE_COLORS entry (set to null to show '?' instead)
+export const DEFAULT_FIXTURE_COLOR = '#ffffff';
+
 // Item texture mapping - maps item IDs to their texture asset paths
 export const ITEM_TEXTURES = {
     mysekai_material: {
