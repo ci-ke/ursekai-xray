@@ -2,9 +2,14 @@
 # -*- coding: utf-8 -*-
 """
 更新 config.js
-从 mysekaiMaterials.json 和 mysekaiFixtures.json 读取信息并更新配置文件
+从 master 目录的 mysekaiMaterials.json、mysekaiFixtures.json 和 materials.json 读取信息并更新配置文件
+
+用法:
+    python update_config.py [master_dir]
+    master_dir 不传时默认为脚本同目录下的 master 文件夹
 """
 
+import argparse
 import io
 import json
 import os
@@ -16,39 +21,77 @@ if sys.platform == 'win32':
     sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 
-def load_materials() -> list[dict[str, Any]]:
-    """加载材料数据"""
+def resolve_master_dir() -> str:
+    """解析 master 数据目录：优先使用命令行参数，否则使用脚本同目录下的 master 文件夹"""
+    parser = argparse.ArgumentParser(
+        description='从 master 数据目录读取 mysekaiMaterials.json / mysekaiFixtures.json 并更新 new_config.js'
+    )
+    parser.add_argument(
+        'master_dir',
+        nargs='?',
+        default=None,
+        help='master 数据目录路径（不传则默认为脚本同目录下的 master 文件夹）'
+    )
+    args = parser.parse_args()
+
+    if args.master_dir:
+        return args.master_dir
+
     script_dir = os.path.dirname(os.path.abspath(__file__))
-    materials_path = os.path.join(script_dir, 'mysekaiMaterials.json')
+    return os.path.join(script_dir, 'master')
+
+
+def load_mysekai_materials(master_dir: str) -> list[dict[str, Any]]:
+    """加载材料数据"""
+    materials_path = os.path.join(master_dir, 'mysekaiMaterials.json')
 
     with open(materials_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
-def load_fixtures() -> list[dict[str, Any]]:
+def load_materials(master_dir: str) -> list[dict[str, Any]]:
+    """加载通用材料数据 (materials.json)"""
+    materials_path = os.path.join(master_dir, 'materials.json')
+
+    with open(materials_path, 'r', encoding='utf-8') as f:
+        return json.load(f)
+
+
+def load_fixtures(master_dir: str) -> list[dict[str, Any]]:
     """加载家具数据"""
-    script_dir = os.path.dirname(os.path.abspath(__file__))
-    fixtures_path = os.path.join(script_dir, 'mysekaiFixtures.json')
+    fixtures_path = os.path.join(master_dir, 'mysekaiFixtures.json')
 
     with open(fixtures_path, 'r', encoding='utf-8') as f:
         return json.load(f)
 
 
-def generate_item_textures(materials: list[dict[str, Any]]) -> dict[str, str]:
-    """生成 ITEM_TEXTURES 映射 (包含所有材料)"""
+def generate_mysekai_item_textures(materials: list[dict[str, Any]]) -> dict[str, str]:
+    """生成 mysekai_material 的纹理映射 (排除 game_character 和 birthday_party 类型)"""
     textures: dict[str, str] = {}
 
     for material in materials:
+        # 排除 game_character 和 birthday_party 类型
+        if material['mysekaiMaterialType'] in ('game_character', 'birthday_party'):
+            continue
+
         item_id = str(material['id'])
         icon_name = material['iconAssetbundleName']
-
-        # 根据材料类型确定路径
-        if material['mysekaiMaterialType'] == 'game_character':
-            path = f"./icon/Texture2D/memoria/{icon_name}.png"
-        else:
-            path = f"./icon/Texture2D/{icon_name}.png"
-
+        path = f"./icon/Texture2D/{icon_name}.png"
         textures[item_id] = path
+
+    return textures
+
+
+def generate_material_textures(materials: list[dict[str, Any]]) -> dict[str, str]:
+    """生成 material 的纹理映射 (仅 materialType == birthday_party_delivery)"""
+    textures: dict[str, str] = {}
+
+    for material in materials:
+        if material['materialType'] != 'birthday_party_delivery':
+            continue
+
+        item_id = str(material['id'])
+        textures[item_id] = f"./icon/Texture2D/material{item_id}.png"
 
     return textures
 
@@ -119,14 +162,15 @@ def format_js_array(data: list[int]) -> str:
     return ', '.join(str(x) for x in data)
 
 
-def update_config(materials: list[dict[str, Any]], fixtures: list[dict[str, Any]]) -> None:
+def update_config(materials: list[dict[str, Any]], fixtures: list[dict[str, Any]], game_materials: list[dict[str, Any]]) -> None:
     """更新 new_config.js 文件"""
     script_dir = os.path.dirname(os.path.abspath(__file__))
     config_path = os.path.join(script_dir, 'new_config.js')
 
     # 生成数据
-    item_textures = generate_item_textures(materials)
+    item_textures = generate_mysekai_item_textures(materials)
     fixture_textures = generate_fixture_textures(fixtures)
+    material_textures = generate_material_textures(game_materials)
     rare_items = generate_rare_items(materials)
     super_rare_items = generate_super_rare_items(materials)
 
@@ -256,6 +300,9 @@ export const ITEM_TEXTURES = {{
     }},
     mysekai_blueprint: {{
         "*": "./icon/Texture2D/item_surplus_blueprint.png"
+    }},
+    material: {{
+{format_js_object(material_textures)}
     }}
 }};
 
@@ -265,7 +312,8 @@ export const RARE_ITEM = {{
     mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: [],
-    mysekai_blueprint: []
+    mysekai_blueprint: [],
+    material: []
 }};
 
 // Super rare item definitions (highest rarity tier)
@@ -274,7 +322,8 @@ export const SUPER_RARE_ITEM = {{
     mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: [],
-    mysekai_blueprint: []
+    mysekai_blueprint: [],
+    material: []
 }};
 
 // Ultra rare item definitions (exceptional rarity tier, overrides super rare styling)
@@ -283,7 +332,8 @@ export const ULTRA_RARE_ITEM = {{
     mysekai_item: [],
     mysekai_fixture: [],
     mysekai_music_record: [],
-    mysekai_blueprint: []
+    mysekai_blueprint: [],
+    material: []
 }};
 """
 
@@ -294,22 +344,27 @@ export const ULTRA_RARE_ITEM = {{
     print("[OK] 已更新 new_config.js")
     print(f"  - 材料纹理映射: {len(item_textures)} 项")
     print(f"  - 家具纹理映射: {len(fixture_textures)} 项")
+    print(f"  - 庆典甘露纹理映射: {len(material_textures)} 项")
     print(f"  - 稀有材料: {len(rare_items)} 项")
     print(f"  - 超稀有材料: {len(super_rare_items)} 项")
 
 
 def main() -> None:
     """主函数"""
-    print("开始更新配置文件...")
+    master_dir = resolve_master_dir()
+    print(f"开始更新配置文件... (数据目录: {master_dir})")
 
     try:
-        materials = load_materials()
-        print(f"[OK] 已加载 {len(materials)} 个材料")
+        mysekai_materials = load_mysekai_materials(master_dir)
+        print(f"[OK] 已加载 {len(mysekai_materials)} 个 mysekai 材料")
 
-        fixtures = load_fixtures()
+        fixtures = load_fixtures(master_dir)
         print(f"[OK] 已加载 {len(fixtures)} 个家具")
 
-        update_config(materials, fixtures)
+        materials = load_materials(master_dir)
+        print(f"[OK] 已加载 {len(materials)} 个通用材料")
+
+        update_config(mysekai_materials, fixtures, materials)
         print("\n更新完成!")
 
     except FileNotFoundError as e:

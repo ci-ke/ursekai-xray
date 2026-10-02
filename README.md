@@ -105,13 +105,13 @@ The tool uses color coding to distinguish between different material types:
 If the project's icon directory doesn't contain the latest game resources:
 
 1. Check the browser console log (F12) to find missing item IDs
-2. Download the texture from [sekai.best item preview](https://sekai.best/asset_viewer/mysekai/item_preview)
+2. Download the texture from [sekai.best item preview](https://sekai.best/asset_viewer/mysekai/item_preview); for `material{id}.png` thumbnails, download from [sekai.best material thumbnail](https://sekai.best/asset_viewer/thumbnail/material/)
 3. Add the downloaded PNG to `icon/Texture2D/` directory
 4. Register the item ID in `paint_local.html` under the `ITEM_TEXTURES` JSON mapping
 
 ## Music Record Title
 
-If want to display music recrod title, put `musics.json` and `mysekaiMusicRecords.json` into `data` folder.
+If want to display music record title, put `musics.json` and `mysekaiMusicRecords.json` into `data/master` folder.
 
 ## License
 

@@ -57,11 +57,11 @@ export function logger(message) {
 async function loadMusicData() {
     try {
         const [records, musics] = await Promise.all([
-            fetch('data/mysekaiMusicRecords.json').then(r => {
+            fetch('data/master/mysekaiMusicRecords.json').then(r => {
                 if (!r.ok) throw new Error(`HTTP ${r.status}`);
                 return r.json();
             }),
-            fetch('data/musics.json').then(r => {
+            fetch('data/master/musics.json').then(r => {
                 if (!r.ok) throw new Error(`HTTP ${r.status}`);
                 return r.json();
             })
@@ -95,11 +95,11 @@ async function loadMusicData() {
 async function loadBlueprintData() {
     try {
         const [blueprints, fixtures] = await Promise.all([
-            fetch('data/mysekaiBlueprints.json').then(r => {
+            fetch('data/master/mysekaiBlueprints.json').then(r => {
                 if (!r.ok) throw new Error(`HTTP ${r.status}`);
                 return r.json();
             }),
-            fetch('data/mysekaiFixtures.json').then(r => {
+            fetch('data/master/mysekaiFixtures.json').then(r => {
                 if (!r.ok) throw new Error(`HTTP ${r.status}`);
                 return r.json();
             })
