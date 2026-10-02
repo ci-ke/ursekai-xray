@@ -535,10 +535,10 @@ export function displayReward(reward, x, y, ifContainRareItem, fragment, isAggre
             itemImage.dataset.category = category;
             itemImage.dataset.itemId = itemId;
             itemImage.dataset.quantity = quantity;
-            if (category === 'mysekai_music_record') {
+            if (category === 'mysekai_music_record' && sceneState.ownedMusicRecordIds) {
                 itemImage.dataset.musicOwned = sceneState.ownedMusicRecordIds.has(String(itemId)) ? 'owned' : 'new';
             }
-            if (category === 'mysekai_blueprint') {
+            if (category === 'mysekai_blueprint' && sceneState.ownedBlueprintIds) {
                 itemImage.dataset.blueprintOwned = sceneState.ownedBlueprintIds.has(String(itemId)) ? 'owned' : 'new';
             }
 

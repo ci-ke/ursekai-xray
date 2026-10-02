@@ -16,8 +16,8 @@ export const sceneState = {
     harvestData: {},
     lastUpdateTime: 0,
     dataLoadedFromFile: false,
-    ownedMusicRecordIds: new Set(), // mysekaiMusicRecordIds the player already owns
-    ownedBlueprintIds: new Set(), // mysekaiBlueprintIds the player already owns
+    ownedMusicRecordIds: null, // mysekaiMusicRecordIds the player already owns; null = not in loaded data, never mark owned/new
+    ownedBlueprintIds: null, // mysekaiBlueprintIds the player already owns; null = not in loaded data, never mark owned/new
 };
 
 // Filter state

@@ -973,10 +973,12 @@ export function updateItemSummary() {
 
         // Special rendering for music records
         if (item.category === "mysekai_music_record") {
-            const isOwned = sceneState.ownedMusicRecordIds.has(String(item.itemId));
-            const ownedLabel = isOwned
-                ? '<span class="music-owned-badge owned">owned</span>'
-                : '<span class="music-owned-badge new">new</span>';
+            let ownedLabel = '';
+            if (sceneState.ownedMusicRecordIds) {
+                ownedLabel = sceneState.ownedMusicRecordIds.has(String(item.itemId))
+                    ? '<span class="music-owned-badge owned">owned</span>'
+                    : '<span class="music-owned-badge new">new</span>';
+            }
             if (item.musicTitle) {
                 // data loaded: "#id: externalId title [owned/new]"
                 const tooltipText = `${item.category} ${item.musicTitle}`;
@@ -997,10 +999,12 @@ export function updateItemSummary() {
             }
         } else if (item.category === "mysekai_blueprint") {
             // Special rendering for blueprints
-            const isOwned = sceneState.ownedBlueprintIds.has(String(item.itemId));
-            const ownedLabel = isOwned
-                ? '<span class="music-owned-badge owned">owned</span>'
-                : '<span class="music-owned-badge new">new</span>';
+            let ownedLabel = '';
+            if (sceneState.ownedBlueprintIds) {
+                ownedLabel = sceneState.ownedBlueprintIds.has(String(item.itemId))
+                    ? '<span class="music-owned-badge owned">owned</span>'
+                    : '<span class="music-owned-badge new">new</span>';
+            }
             if (item.blueprintName) {
                 // data loaded: "#id name [owned/new]"
                 const tooltipText = `${item.category} ${item.blueprintName}`;
@@ -1190,6 +1194,8 @@ export function clearLoadedData() {
     // Clear harvest data
     sceneState.harvestData = {};
     sceneState.dataLoadedFromFile = false;
+    sceneState.ownedMusicRecordIds = null;
+    sceneState.ownedBlueprintIds = null;
 
     // Clear localStorage cache
     try {

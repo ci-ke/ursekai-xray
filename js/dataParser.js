@@ -190,18 +190,30 @@ export function parseMapDataStandard(gameData) {
     const harvestMaps = gameData.updatedResources.userMysekaiHarvestMaps;
     logger(`Found ${harvestMaps.length} scenes`);
 
-    // Extract owned music record IDs
-    const musicRecords = gameData.updatedResources.userMysekaiMusicRecords || [];
-    sceneState.ownedMusicRecordIds = new Set(musicRecords.map(r => String(r.mysekaiMusicRecordId)));
-    if (musicRecords.length > 0) {
-        logger(`Found ${musicRecords.length} owned music records`);
+    // Extract owned music record IDs. An absent field means ownership is unknown:
+    // reset to null so nothing gets marked owned/new (an empty array means the
+    // player genuinely owns none and everything is "new").
+    const musicRecordsRaw = gameData.updatedResources.userMysekaiMusicRecords;
+    if (musicRecordsRaw != null) {
+        sceneState.ownedMusicRecordIds = new Set(musicRecordsRaw.map(r => String(r.mysekaiMusicRecordId)));
+        if (musicRecordsRaw.length > 0) {
+            logger(`Found ${musicRecordsRaw.length} owned music records`);
+        }
+    } else {
+        sceneState.ownedMusicRecordIds = null;
+        logger('userMysekaiMusicRecords not found - skipping owned/new markers for music records');
     }
 
-    // Extract owned blueprint IDs
-    const blueprints = gameData.updatedResources.userMysekaiBlueprints || [];
-    sceneState.ownedBlueprintIds = new Set(blueprints.map(b => String(b.mysekaiBlueprintId)));
-    if (blueprints.length > 0) {
-        logger(`Found ${blueprints.length} owned blueprints`);
+    // Extract owned blueprint IDs (same absent-vs-empty rule as music records)
+    const blueprintsRaw = gameData.updatedResources.userMysekaiBlueprints;
+    if (blueprintsRaw != null) {
+        sceneState.ownedBlueprintIds = new Set(blueprintsRaw.map(b => String(b.mysekaiBlueprintId)));
+        if (blueprintsRaw.length > 0) {
+            logger(`Found ${blueprintsRaw.length} owned blueprints`);
+        }
+    } else {
+        sceneState.ownedBlueprintIds = null;
+        logger('userMysekaiBlueprints not found - skipping owned/new markers for blueprints');
     }
 
     const processedMap = {};
